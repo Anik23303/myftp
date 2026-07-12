@@ -5,133 +5,319 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Movie FTP</title>
     <style>
+        /* ===== THEME VARIABLES ===== */
+        :root {
+            --bg-primary: #141414;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #1a1a2e;
+            --bg-hover: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #e5e5e5;
+            --text-muted: #888888;
+            --border-color: #333333;
+            --accent: #e50914;
+            --accent-hover: #ff0a1a;
+            --shadow: rgba(0,0,0,0.8);
+            --success: #00ff00;
+        }
+        
+        [data-theme="light"] {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-hover: #e8e8e8;
+            --text-primary: #141414;
+            --text-secondary: #333333;
+            --text-muted: #666666;
+            --border-color: #dddddd;
+            --shadow: rgba(0,0,0,0.1);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             font-family: 'Helvetica Neue', Arial, sans-serif;
-            background: #141414; 
-            color: #fff; 
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: background 0.3s, color 0.3s;
         }
+        
+        /* ===== REGISTER CONTAINER ===== */
         .register-container {
-            background: #1a1a2e;
-            padding: 40px;
+            background: var(--bg-secondary);
+            padding: 45px 40px;
             border-radius: 12px;
-            border: 1px solid #333;
+            border: 1px solid var(--border-color);
             max-width: 450px;
             width: 90%;
+            box-shadow: 0 20px 60px var(--shadow);
+            transition: all 0.3s;
+            margin: 20px;
         }
-        .register-container h1 {
-            color: #e50914;
+        .register-container .logo {
             text-align: center;
             margin-bottom: 10px;
         }
-        .register-container p {
-            color: #888;
+        .register-container .logo h1 {
+            color: var(--accent);
+            font-size: 2rem;
+            letter-spacing: -1px;
+        }
+        .register-container .logo .subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .register-container h2 {
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 5px;
+            font-size: 1.3rem;
+        }
+        .register-container .desc {
+            color: var(--text-muted);
             text-align: center;
             margin-bottom: 25px;
             font-size: 0.9rem;
         }
+        
+        /* ===== AVATAR PREVIEW ===== */
+        .avatar-preview-wrapper {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .avatar-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--bg-hover);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            overflow: hidden;
+            border: 3px solid var(--border-color);
+            transition: border-color 0.3s;
+        }
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .avatar-preview.has-image {
+            border-color: var(--success);
+        }
+        
+        /* ===== FORM ===== */
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
         .form-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             font-weight: bold;
             font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .form-group label .required {
+            color: var(--accent);
         }
         .form-group input {
             width: 100%;
-            padding: 12px;
-            border: none;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
             border-radius: 6px;
-            background: #2a2a3e;
-            color: white;
+            background: var(--bg-hover);
+            color: var(--text-primary);
             font-size: 1rem;
+            transition: border-color 0.3s;
         }
         .form-group input:focus {
-            outline: 2px solid #e50914;
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.2);
         }
-        .form-group input[type="file"] {
-            padding: 8px;
-            background: #2a2a3e;
+        .form-group input::placeholder {
+            color: var(--text-muted);
         }
+        .form-group .hint {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            margin-top: 4px;
+        }
+        
+        /* ===== FILE INPUT ===== */
+        .file-input-wrapper {
+            position: relative;
+        }
+        .file-input-wrapper input[type="file"] {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .file-input-wrapper input[type="file"]::file-selector-button {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 4px;
+            background: var(--accent);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .file-input-wrapper input[type="file"]::file-selector-button:hover {
+            background: var(--accent-hover);
+        }
+        
+        /* ===== BUTTONS ===== */
         .btn-submit {
             width: 100%;
-            padding: 12px;
+            padding: 13px;
             border: none;
             border-radius: 6px;
-            background: #e50914;
+            background: var(--accent);
             color: white;
             font-weight: bold;
             font-size: 1rem;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: background 0.3s, transform 0.2s;
         }
         .btn-submit:hover {
-            background: #ff0a1a;
+            background: var(--accent-hover);
+            transform: scale(1.01);
         }
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+        .btn-submit .icon {
+            margin-right: 8px;
+        }
+        
+        /* ===== FLASH MESSAGES ===== */
         .flash {
-            padding: 10px;
+            padding: 12px 15px;
             border-radius: 6px;
             margin-bottom: 15px;
+            font-size: 0.9rem;
         }
         .flash.success {
             background: #1a3a1a;
-            color: #00ff00;
-            border: 1px solid #00ff00;
+            color: var(--success);
+            border: 1px solid var(--success);
         }
         .flash.error {
             background: #3a1a1a;
             color: #ff4444;
             border: 1px solid #ff4444;
         }
+        
+        /* ===== LINKS ===== */
         .links {
             text-align: center;
             margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
         }
         .links a {
-            color: #e50914;
+            color: var(--text-muted);
             text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
         }
         .links a:hover {
-            text-decoration: underline;
+            color: var(--accent);
         }
-        .info {
-            color: #888;
-            font-size: 0.8rem;
-            text-align: center;
-            margin-top: 15px;
+        .links .home-link {
+            display: inline-block;
+            margin-top: 10px;
         }
-        .preview-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #2a2a3e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
+        
+        /* ===== INFO BOX ===== */
+        .info-box {
+            background: var(--bg-hover);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 3px solid var(--accent);
+        }
+        .info-box p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        .info-box p .highlight {
+            color: var(--text-secondary);
             font-weight: bold;
-            color: #fff;
-            margin: 10px auto;
         }
-        .preview-avatar img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
+        
+        /* ===== THEME TOGGLE ===== */
+        .theme-toggle-wrapper {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+        .theme-toggle-wrapper button {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .theme-toggle-wrapper button:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 480px) {
+            .register-container { padding: 30px 20px; margin: 10px; }
+            .register-container .logo h1 { font-size: 1.5rem; }
+            .theme-toggle-wrapper { top: 10px; right: 10px; }
+            .theme-toggle-wrapper button { padding: 5px 12px; font-size: 0.8rem; }
+            .avatar-preview { width: 60px; height: 60px; font-size: 2rem; }
         }
     </style>
 </head>
-<body>
+<body data-theme="{{ theme }}">
+
+    <!-- ===== THEME TOGGLE ===== -->
+    <div class="theme-toggle-wrapper">
+        <button onclick="toggleTheme()">
+            {% if theme == 'dark' %}☀️ Light{% else %}🌙 Dark{% endif %}
+        </button>
+    </div>
+
+    <!-- ===== REGISTER CONTAINER ===== -->
     <div class="register-container">
-        <h1>📝 Create Account</h1>
-        <p>Join our community and start uploading movies</p>
+        <div class="logo">
+            <h1>🎬 Movie FTP</h1>
+            <div class="subtitle">Join our community</div>
+        </div>
         
+        <h2>📝 Create Account</h2>
+        <p class="desc">Register to start uploading and sharing movies</p>
+        
+        <!-- ===== INFO BOX ===== -->
+        <div class="info-box">
+            <p>
+                📌 <span class="highlight">Why register?</span><br>
+                • Upload your own movies<br>
+                • Track your video views<br>
+                • Create your "My List"<br>
+                • Join the leaderboard!
+            </p>
+        </div>
+        
+        <!-- ===== FLASH MESSAGES ===== -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -140,42 +326,156 @@
             {% endif %}
         {% endwith %}
         
-        <form method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" name="username" required minlength="3" pattern="[A-Za-z0-9]+" title="Alphanumeric only">
+        <!-- ===== REGISTER FORM ===== -->
+        <form method="POST" enctype="multipart/form-data" id="registerForm">
+            
+            <!-- Avatar Preview -->
+            <div class="avatar-preview-wrapper">
+                <div class="avatar-preview" id="avatarPreview">?</div>
+                <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 5px;">Profile picture (optional)</p>
             </div>
+            
             <div class="form-group">
-                <label>Password</label>
-                <input type="password" name="password" required minlength="6">
+                <label>Username <span class="required">*</span></label>
+                <input type="text" name="username" placeholder="Choose a username" required minlength="3" pattern="[A-Za-z0-9]+" title="Alphanumeric only, 3+ characters" autocomplete="username">
+                <div class="hint">Alphanumeric only, minimum 3 characters</div>
             </div>
+            
+            <div class="form-group">
+                <label>Password <span class="required">*</span></label>
+                <input type="password" name="password" placeholder="Create a password" required minlength="6" autocomplete="new-password">
+                <div class="hint">Minimum 6 characters</div>
+            </div>
+            
             <div class="form-group">
                 <label>Profile Picture (optional)</label>
-                <input type="file" name="profile_pic" accept=".jpg,.jpeg,.png,.gif,.webp" onchange="previewImage(this)">
-                <div class="preview-avatar" id="avatarPreview">?</div>
+                <div class="file-input-wrapper">
+                    <input type="file" name="profile_pic" accept=".jpg,.jpeg,.png,.gif,.webp" onchange="previewImage(this)">
+                </div>
+                <div class="hint">Supported: JPG, PNG, GIF, WEBP (Max 5MB)</div>
             </div>
-            <button type="submit" class="btn-submit">Register</button>
+            
+            <button type="submit" class="btn-submit" id="registerBtn">
+                <span class="icon">📝</span> Create Account
+            </button>
         </form>
         
         <div class="links">
             <a href="/login">Already have an account? Login</a><br>
-            <a href="/">← Back to home</a>
+            <a href="/" class="home-link">← Back to home</a>
         </div>
     </div>
 
     <script>
+        // ===== THEME TOGGLE =====
+        function toggleTheme() {
+            fetch('/toggle-theme')
+                .then(() => location.reload());
+        }
+
+        // ===== IMAGE PREVIEW =====
         function previewImage(input) {
             const preview = document.getElementById('avatarPreview');
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                    preview.classList.add('has-image');
                 };
                 reader.readAsDataURL(input.files[0]);
             } else {
                 preview.innerHTML = '?';
+                preview.classList.remove('has-image');
             }
         }
+
+        // ===== FORM VALIDATION =====
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const btn = document.getElementById('registerBtn');
+            const username = document.querySelector('input[name="username"]').value.trim();
+            const password = document.querySelector('input[name="password"]').value.trim();
+            
+            // Validate username
+            if (username.length < 3) {
+                e.preventDefault();
+                showFlash('Username must be at least 3 characters', 'error');
+                return;
+            }
+            if (!/^[A-Za-z0-9]+$/.test(username)) {
+                e.preventDefault();
+                showFlash('Username must be alphanumeric only', 'error');
+                return;
+            }
+            
+            // Validate password
+            if (password.length < 6) {
+                e.preventDefault();
+                showFlash('Password must be at least 6 characters', 'error');
+                return;
+            }
+            
+            // Show loading state
+            btn.innerHTML = '⏳ Creating account...';
+            btn.disabled = true;
+        });
+
+        // ===== FLASH MESSAGES (for validation errors) =====
+        function showFlash(message, type = 'error') {
+            const container = document.querySelector('.register-container');
+            const existing = container.querySelector('.flash');
+            if (existing) existing.remove();
+            
+            const flash = document.createElement('div');
+            flash.className = `flash ${type}`;
+            flash.textContent = message;
+            container.insertBefore(flash, document.getElementById('registerForm'));
+            
+            setTimeout(() => {
+                if (flash) flash.remove();
+            }, 5000);
+        }
+
+        // ===== KEYBOARD SHORTCUTS =====
+        document.addEventListener('keydown', function(e) {
+            // Escape to go back
+            if (e.key === 'Escape') {
+                window.location.href = '/';
+            }
+        });
+
+        // ===== AUTO-FOCUS ON USERNAME =====
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('input[name="username"]').focus();
+        });
+
+        // ===== PASSWORD STRENGTH INDICATOR (optional) =====
+        // Uncomment below to add password strength indicator
+        /*
+        document.querySelector('input[name="password"]').addEventListener('input', function() {
+            const val = this.value;
+            const strength = document.getElementById('passwordStrength');
+            if (!strength) {
+                const s = document.createElement('div');
+                s.id = 'passwordStrength';
+                s.style.cssText = 'margin-top:5px;font-size:0.75rem;';
+                this.parentElement.appendChild(s);
+            }
+            const el = document.getElementById('passwordStrength');
+            if (val.length === 0) {
+                el.textContent = '';
+                el.style.color = '';
+            } else if (val.length < 4) {
+                el.textContent = '⚠️ Weak';
+                el.style.color = '#ff4444';
+            } else if (val.length < 8) {
+                el.textContent = '⚠️ Medium';
+                el.style.color = '#ffd700';
+            } else {
+                el.textContent = '✅ Strong';
+                el.style.color = '#00ff00';
+            }
+        });
+        */
     </script>
 </body>
 </html>
