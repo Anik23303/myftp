@@ -767,3 +767,192 @@
             </div>
         </div>
     </div>
+
+    <!-- ===== UPLOAD MODAL ===== -->
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <h2>📤 Upload Movie</h2>
+            <div class="message" id="modalMessage"></div>
+            
+            <!-- Login Form -->
+            <div id="loginForm">
+                <p style="color: #888; margin-bottom: 15px; text-align: center;">Please login to upload</p>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="loginUsername" placeholder="Enter username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter password">
+                </div>
+                <button class="btn-submit" onclick="handleLogin()">Login</button>
+            </div>
+            
+            <!-- Upload Form -->
+            <div id="uploadForm" style="display:none;">
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="uploadCategory">
+                        {% for cat in categories %}
+                        <option value="{{ cat.id }}">{{ cat.icon }} {{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Movie Title (optional)</label>
+                    <input type="text" id="uploadTitle" placeholder="Leave empty to use filename">
+                </div>
+                <div class="form-group">
+                    <label>Select Movie File</label>
+                    <input type="file" id="uploadFile" accept=".mp4,.mkv,.avi,.mov">
+                </div>
+                <button class="btn-submit" onclick="handleUpload()">Upload Movie</button>
+            </div>
+            
+            <button class="btn-close" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // ===== SIDEBAR TOGGLE =====
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('overlay').classList.remove('active');
+        }
+
+        // ===== NAVBAR SCROLL EFFECT =====
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // ===== MODAL FUNCTIONS =====
+        function openUploadModal() {
+            document.getElementById('uploadModal').classList.add('active');
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('uploadForm').style.display = 'none';
+            document.getElementById('modalMessage').className = 'message';
+            document.getElementById('modalMessage').textContent = '';
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+            
+            fetch('/api/check-auth')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.logged_in) {
+                        showUploadForm(data.username);
+                    }
+                });
+        }
+
+        function closeModal() {
+            document.getElementById('uploadModal').classList.remove('active');
+        }
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('modalMessage');
+            msg.textContent = text;
+            msg.className = 'message ' + type;
+        }
+
+        function showUploadForm(username) {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('uploadForm').style.display = 'block';
+        }
+
+        // ===== LOGIN =====
+        function handleLogin() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            
+            if (!username || !password) {
+                showMessage('Please enter username and password', 'error');
+                return;
+            }
+
+            fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) {
+                    showMessage(data.error, 'error');
+                } else {
+                    showMessage('Login successful!', 'success');
+                    setTimeout(() => {
+                        showUploadForm(username);
+                        location.reload();
+                    }, 500);
+                }
+            })
+            .catch(() => showMessage('Login failed', 'error'));
+        }
+
+        // ===== UPLOAD =====
+        function handleUpload() {
+            const category = document.getElementById('uploadCategory').value;
+            const title = document.getElementById('uploadTitle').value.trim();
+            const fileInput = document.getElementById('uploadFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showMessage('Please select a movie file', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('movie_file', file);
+            formData.append('category', category);
+            if (title) formData.append('title', title);
+
+            showMessage('Uploading... Please wait', 'success');
+
+            fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) {
+                    showMessage(data.error, 'error');
+                } else {
+                    showMessage(data.message, 'success');
+                    fileInput.value = '';
+                    document.getElementById('uploadTitle').value = '';
+                    setTimeout(() => location.reload(), 2000);
+                }
+            })
+            .catch(() => showMessage('Upload failed', 'error'));
+        }
+
+        // ===== LOGOUT =====
+        function handleLogout() {
+            fetch('/api/logout', { method: 'POST' })
+                .then(() => {
+                    closeSidebar();
+                    location.reload();
+                });
+        }
+
+        // ===== CLOSE MODAL ON ESCAPE =====
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // ===== CLICK OUTSIDE MODAL TO CLOSE =====
+        document.getElementById('uploadModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>
