@@ -27,16 +27,25 @@ FTP_PASS = os.getenv('FTP_PASS', '')
 USERS_FILE = "users.json"
 ADMIN_TOKEN = os.getenv('ADMIN_TOKEN', 'admin123')
 
-# Movie Categories
+# ===== MOVIE CATEGORIES WITH ADULT (18+) =====
 MOVIE_CATEGORIES = [
-    {'id': 'action', 'name': '🔥 Action', 'icon': '🎬'},
-    {'id': 'comedy', 'name': '😂 Comedy', 'icon': '😄'},
-    {'id': 'drama', 'name': '🎭 Drama', 'icon': '🎪'},
-    {'id': 'horror', 'name': '👻 Horror', 'icon': '🧛'},
-    {'id': 'sci-fi', 'name': '🚀 Sci-Fi', 'icon': '👾'},
-    {'id': 'romance', 'name': '💕 Romance', 'icon': '🌹'},
-    {'id': 'documentary', 'name': '📹 Documentary', 'icon': '🎥'},
-    {'id': 'anime', 'name': '🗾 Anime', 'icon': '🎌'},
+    # Regular categories (all ages)
+    {'id': 'action', 'name': '🔥 Action', 'icon': '🎬', 'adult': False},
+    {'id': 'comedy', 'name': '😂 Comedy', 'icon': '😄', 'adult': False},
+    {'id': 'drama', 'name': '🎭 Drama', 'icon': '🎪', 'adult': False},
+    {'id': 'horror', 'name': '👻 Horror', 'icon': '🧛', 'adult': False},
+    {'id': 'sci-fi', 'name': '🚀 Sci-Fi', 'icon': '👾', 'adult': False},
+    {'id': 'romance', 'name': '💕 Romance', 'icon': '🌹', 'adult': False},
+    {'id': 'documentary', 'name': '📹 Documentary', 'icon': '🎥', 'adult': False},
+    {'id': 'anime', 'name': '🗾 Anime', 'icon': '🎌', 'adult': False},
+    
+    # Adult (18+) categories - NO AGE VERIFICATION
+    {'id': 'adult', 'name': '🔞 Adult 18+', 'icon': '🔞', 'adult': True},
+    {'id': 'adult_action', 'name': '🔞 Adult Action', 'icon': '🔥', 'adult': True},
+    {'id': 'adult_drama', 'name': '🔞 Adult Drama', 'icon': '🎭', 'adult': True},
+    {'id': 'adult_romance', 'name': '🔞 Adult Romance', 'icon': '❤️‍🔥', 'adult': True},
+    {'id': 'adult_horror', 'name': '🔞 Adult Horror', 'icon': '🧛', 'adult': True},
+    {'id': 'adult_comedy', 'name': '🔞 Adult Comedy', 'icon': '😂', 'adult': True},
 ]
 
 # ===== USER MANAGEMENT =====
@@ -93,20 +102,77 @@ def get_ftp_connection():
     ftp.set_pasv(True)
     return ftp
 
-# ===== MOCK DATA (for when FTP is not available) =====
+# ===== MOCK DATA WITH ADULT MOVIES =====
 MOCK_MOVIES = {
+    # Regular categories
     'action': [
         {'title': 'The Dark Knight', 'year': 2008, 'size': '2.1 GB', 'format': 'MKV'},
         {'title': 'Inception', 'year': 2010, 'size': '1.8 GB', 'format': 'MP4'},
         {'title': 'Mad Max: Fury Road', 'year': 2015, 'size': '2.4 GB', 'format': 'MKV'},
+        {'title': 'John Wick', 'year': 2014, 'size': '1.9 GB', 'format': 'MP4'},
+        {'title': 'Gladiator', 'year': 2000, 'size': '2.2 GB', 'format': 'MKV'},
     ],
     'comedy': [
         {'title': 'Superbad', 'year': 2007, 'size': '1.5 GB', 'format': 'MP4'},
         {'title': 'The Hangover', 'year': 2009, 'size': '1.7 GB', 'format': 'MKV'},
+        {'title': 'Bridesmaids', 'year': 2011, 'size': '1.6 GB', 'format': 'MP4'},
+    ],
+    'drama': [
+        {'title': 'The Shawshank Redemption', 'year': 1994, 'size': '2.3 GB', 'format': 'MKV'},
+        {'title': 'The Godfather', 'year': 1972, 'size': '2.1 GB', 'format': 'MP4'},
+        {'title': 'Forrest Gump', 'year': 1994, 'size': '2.0 GB', 'format': 'MKV'},
+    ],
+    'horror': [
+        {'title': 'The Conjuring', 'year': 2013, 'size': '1.8 GB', 'format': 'MKV'},
+        {'title': 'Hereditary', 'year': 2018, 'size': '2.0 GB', 'format': 'MP4'},
+        {'title': 'Get Out', 'year': 2017, 'size': '1.7 GB', 'format': 'MKV'},
     ],
     'sci-fi': [
         {'title': 'Interstellar', 'year': 2014, 'size': '2.6 GB', 'format': 'MKV'},
         {'title': 'The Matrix', 'year': 1999, 'size': '1.9 GB', 'format': 'MP4'},
+        {'title': 'Dune', 'year': 2021, 'size': '3.2 GB', 'format': 'MKV'},
+        {'title': 'Blade Runner 2049', 'year': 2017, 'size': '2.8 GB', 'format': 'MKV'},
+    ],
+    'romance': [
+        {'title': 'The Notebook', 'year': 2004, 'size': '1.6 GB', 'format': 'MP4'},
+        {'title': 'Titanic', 'year': 1997, 'size': '2.4 GB', 'format': 'MKV'},
+    ],
+    'documentary': [
+        {'title': 'Planet Earth II', 'year': 2016, 'size': '4.5 GB', 'format': 'MKV'},
+        {'title': 'Our Planet', 'year': 2019, 'size': '3.8 GB', 'format': 'MP4'},
+    ],
+    'anime': [
+        {'title': 'Spirited Away', 'year': 2001, 'size': '1.7 GB', 'format': 'MKV'},
+        {'title': 'Your Name', 'year': 2016, 'size': '1.5 GB', 'format': 'MP4'},
+        {'title': 'Demon Slayer', 'year': 2020, 'size': '2.0 GB', 'format': 'MKV'},
+    ],
+    
+    # Adult (18+) categories
+    'adult': [
+        {'title': 'Adult Collection Vol 1', 'year': 2024, 'size': '3.2 GB', 'format': 'MKV'},
+        {'title': 'Adult Collection Vol 2', 'year': 2024, 'size': '3.5 GB', 'format': 'MP4'},
+    ],
+    'adult_action': [
+        {'title': 'Adult Action Movie 1', 'year': 2024, 'size': '2.5 GB', 'format': 'MKV'},
+        {'title': 'Adult Action Movie 2', 'year': 2023, 'size': '2.8 GB', 'format': 'MP4'},
+        {'title': 'Adult Action Movie 3', 'year': 2024, 'size': '3.1 GB', 'format': 'MKV'},
+    ],
+    'adult_drama': [
+        {'title': 'Adult Drama Movie 1', 'year': 2023, 'size': '2.2 GB', 'format': 'MKV'},
+        {'title': 'Adult Drama Movie 2', 'year': 2024, 'size': '2.4 GB', 'format': 'MP4'},
+    ],
+    'adult_romance': [
+        {'title': 'Adult Romance Movie 1', 'year': 2024, 'size': '2.1 GB', 'format': 'MKV'},
+        {'title': 'Adult Romance Movie 2', 'year': 2023, 'size': '2.3 GB', 'format': 'MP4'},
+        {'title': 'Adult Romance Movie 3', 'year': 2024, 'size': '2.6 GB', 'format': 'MKV'},
+    ],
+    'adult_horror': [
+        {'title': 'Adult Horror Movie 1', 'year': 2024, 'size': '2.6 GB', 'format': 'MKV'},
+        {'title': 'Adult Horror Movie 2', 'year': 2023, 'size': '2.9 GB', 'format': 'MP4'},
+    ],
+    'adult_comedy': [
+        {'title': 'Adult Comedy Movie 1', 'year': 2024, 'size': '2.0 GB', 'format': 'MKV'},
+        {'title': 'Adult Comedy Movie 2', 'year': 2023, 'size': '2.2 GB', 'format': 'MP4'},
     ],
 }
 
@@ -211,11 +277,14 @@ def category_movies(category_id):
     category = next((c for c in MOVIE_CATEGORIES if c['id'] == category_id), None)
     if not category:
         abort(404)
+    
     movies = get_movie_listing(category_id)
+    
     return render_template('movies.html', 
                          category=category_id,
                          category_name=category['name'],
                          category_icon=category['icon'],
+                         category_adult=category.get('adult', False),
                          movies=movies,
                          categories=MOVIE_CATEGORIES,
                          logged_in='username' in session,
@@ -412,9 +481,7 @@ def admin_change_password():
 def health():
     return jsonify({'status': 'healthy', 'timestamp': datetime.now().isoformat()})
 
-# ===== THIS IS THE IMPORTANT PART - FIXES THE PORT ISSUE =====
+# ===== SERVER START =====
 if __name__ == '__main__':
-    # Get port from environment variable or default to 5000
     port = int(os.getenv('PORT', 5000))
-    # Bind to 0.0.0.0 to accept all connections
     app.run(debug=False, host='0.0.0.0', port=port)
