@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ profile_user }}'s Profile - Movie FTP</title>
+    <style>
+        /* ===== THEME VARIABLES ===== */
+        :root {
+            --bg-primary: #141414;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #1a1a2e;
+            --bg-hover: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #e5e5e5;
+            --text-muted: #888888;
+            --border-color: #333333;
+            --accent: #e50914;
+            --accent-hover: #ff0a1a;
+            --shadow: rgba(0,0,0,0.8);
+            --success: #00ff00;
+            --gold: #ffd700;
+        }
+        
+        [data-theme="light"] {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-hover: #e8e8e8;
+            --text-primary: #141414;
+            --text-secondary: #333333;
+            --text-muted: #666666;
+            --border-color: #dddddd;
+            --shadow: rgba(0,0,0,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 10px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .navbar .brand a {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .navbar .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .navbar .nav-right a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .navbar .nav-right a:hover { color: var(--text-primary); }
+        .navbar .nav-right .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .navbar .nav-right .theme-toggle:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+        
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 30px 30px;
+        }
+        
+        /* ===== BACK LINK ===== */
+        .back-link {
+            display: inline-block;
+            color: var(--accent);
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* ===== PROFILE HEADER ===== */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 35px;
+            padding: 30px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+        .profile-header .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: bold;
+            color: white;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .profile-header .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .profile-header .user-info {
+            flex: 1;
+        }
+        .profile-header .user-info h1 {
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .profile-header .user-info h1 .role-badge {
+            font-size: 0.7rem;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .profile-header .user-info h1 .role-badge.admin {
+            background: var(--accent);
+            color: white;
+        }
+        .profile-header .user-info h1 .role-badge.user {
+            background: var(--bg-hover);
+            color: var(--text-muted);
+        }
+        .profile-header .user-info .stats-row {
+            display: flex;
+            gap: 25px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .profile-header .user-info .stats-row .stat-item {
+            background: var(--bg-hover);
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        .profile-header .user-info .stats-row .stat-item .num {
+            color: var(--accent);
+            font-weight: bold;
+        }
+        .profile-header .user-info .joined-date {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+        
+        /* ===== SECTION TITLE ===== */
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .section-title .count {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: normal;
+        }
+        
+        /* ===== VIDEOS GRID ===== */
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 25px;
+        }
+        .video-card {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid var(--border-color);
+        }
+        .video-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px var(--shadow);
+            border-color: var(--accent);
+            z-index: 10;
+        }
+        .video-card .poster {
+            height: 200px;
+            background: var(--bg-hover);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            position: relative;
+        }
+        .video-card .poster .views-badge {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+        }
+        .video-card .info {
+            padding: 12px 15px;
+        }
+        .video-card .info .title {
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+        .video-card .info .meta {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+            flex-wrap: wrap;
+        }
+        .video-card .info .meta span {
+            background: var(--bg-hover);
+            padding: 2px 10px;
+            border-radius: 4px;
+        }
+        .video-card .actions {
+            padding: 10px 15px 15px;
+            display: flex;
+            gap: 8px;
+        }
+        .video-card .actions a {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-stream { background: var(--accent); color: white; }
+        .btn-stream:hover { background: var(--accent-hover); }
+        .btn-download { background: var(--bg-hover); color: var(--text-secondary); }
+        .btn-download:hover { background: var(--bg-hover); opacity: 0.8; }
+        
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+            grid-column: 1 / -1;
+        }
+        .empty-state .icon { font-size: 4rem; display: block; margin-bottom: 20px; }
+        .empty-state h2 { color: var(--text-secondary); margin-bottom: 10px; }
+        
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            padding: 12px 20px;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            box-shadow: 0 10px 30px var(--shadow);
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid var(--success);
+            max-width: 350px;
+        }
+        .toast.error { border-left-color: var(--accent); }
+        .toast.info { border-left-color: var(--gold); }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .container { padding: 70px 15px 20px; }
+            .profile-header { flex-direction: column; text-align: center; padding: 20px; }
+            .profile-header .user-info .stats-row { justify-content: center; }
+            .profile-header .avatar { width: 80px; height: 80px; font-size: 2.5rem; }
+            .videos-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+            .video-card .poster { height: 160px; font-size: 2.5rem; }
+            .navbar { padding: 10px 15px; }
+            .profile-header .user-info h1 { font-size: 1.5rem; flex-wrap: wrap; justify-content: center; }
+        }
+        @media (max-width: 480px) {
+            .videos-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .video-card .poster { height: 140px; font-size: 2rem; }
+            .video-card .info { padding: 10px; }
+            .video-card .info .title { font-size: 0.85rem; }
+            .video-card .actions { flex-wrap: wrap; }
+            .video-card .actions a { font-size: 0.7rem; padding: 5px; }
+            .profile-header .user-info .stats-row .stat-item { font-size: 0.8rem; padding: 4px 12px; }
+        }
+    </style>
+</head>
+<body data-theme="{{ theme }}">
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <div class="brand"><a href="/">🎬 Movie FTP</a></div>
+        <div class="nav-right">
+            <button class="theme-toggle" onclick="toggleTheme()">
+                {% if theme == 'dark' %}☀️ Light{% else %}🌙 Dark{% endif %}
+            </button>
+            <a href="/">Home</a>
+            {% if logged_in %}
+                <a href="/dashboard">Dashboard</a>
+                <a href="/logout">Logout</a>
+            {% else %}
+                <a href="/login">Login</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- ===== CONTAINER ===== -->
+    <div class="container">
+        
+        <!-- ===== BACK LINK ===== -->
+        <a href="/" class="back-link">← Back to home</a>
+        
+        <!-- ===== PROFILE HEADER ===== -->
+        <div class="profile-header">
+            <div class="avatar">
+                {% if user_data.profile_pic %}
+                    <img src="{{ user_data.profile_pic }}" alt="{{ profile_user }}">
+                {% else %}
+                    {{ profile_user[0].upper() }}
+                {% endif %}
+            </div>
+            <div class="user-info">
+                <h1>
+                    👤 {{ profile_user }}
+                    <span class="role-badge {{ user_data.role }}">
+                        {{ user_data.role|title }}
+                    </span>
+                    {% if current_user == profile_user %}
+                    <span style="color: var(--success); font-size:0.8rem; font-weight:normal;">(You)</span>
+                    {% endif %}
+                </h1>
+                <div class="stats-row">
+                    <span class="stat-item">🎬 <span class="num">{{ videos|length }}</span> videos</span>
+                    <span class="stat-item">👁️ <span class="num">{{ user_data.total_views or 0 }}</span> total views</span>
+                    <span class="stat-item">📹 <span class="num">{{ user_data.total_uploads or 0 }}</span> uploads</span>
+                </div>
+                <div class="joined-date">
+                    📅 Joined: {{ user_data.created_at[:10] if user_data.created_at else 'Unknown' }}
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== VIDEOS SECTION ===== -->
+        <div class="section-title">
+            <span>🎬 Uploaded Videos</span>
+            <span class="count">{{ videos|length }} video(s)</span>
+        </div>
+
+        {% if videos %}
+        <div class="videos-grid">
+            {% for video in videos %}
+            <div class="video-card">
+                <div class="poster" style="background: {{ video.get('thumbnail_color', '#2a2a3e') }};">
+                    🎬
+                    <span class="views-badge">👁️ {{ video.views }}</span>
+                </div>
+                <div class="info">
+                    <div class="title">{{ video.title }}</div>
+                    <div class="meta">
+                        <span>📁 {{ video.category }}</span>
+                        <span>{{ video.size }}</span>
+                    </div>
+                </div>
+                <div class="actions">
+                    <a href="/stream/{{ video.category }}/{{ video.filename }}" class="btn-stream">▶ Stream</a>
+                    <a href="/download/{{ video.category }}/{{ video.filename }}" class="btn-download">⬇ Download</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <span class="icon">📭</span>
+            <h2>No videos uploaded yet</h2>
+            <p>{{ profile_user }} hasn't uploaded any movies yet.</p>
+            {% if current_user == profile_user %}
+            <a href="/" style="color: var(--accent); text-decoration: none; margin-top: 10px; display: inline-block;">📤 Upload your first movie</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ===== TOAST CONTAINER ===== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // ===== THEME TOGGLE =====
+        function toggleTheme() {
+            fetch('/toggle-theme')
+                .then(() => location.reload());
+        }
+
+        // ===== TOAST =====
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ===== KEYBOARD SHORTCUTS =====
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                window.location.href = '/';
+            }
+        });
+    </script>
+</body>
+</html>
