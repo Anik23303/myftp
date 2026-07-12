@@ -5,104 +5,263 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - Movie FTP</title>
     <style>
+        /* ===== THEME VARIABLES ===== */
+        :root {
+            --bg-primary: #141414;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #1a1a2e;
+            --bg-hover: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #e5e5e5;
+            --text-muted: #888888;
+            --border-color: #333333;
+            --accent: #e50914;
+            --accent-hover: #ff0a1a;
+            --shadow: rgba(0,0,0,0.8);
+            --success: #00ff00;
+        }
+        
+        [data-theme="light"] {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-hover: #e8e8e8;
+            --text-primary: #141414;
+            --text-secondary: #333333;
+            --text-muted: #666666;
+            --border-color: #dddddd;
+            --shadow: rgba(0,0,0,0.1);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             font-family: 'Helvetica Neue', Arial, sans-serif;
-            background: #141414; 
-            color: #fff; 
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: background 0.3s, color 0.3s;
         }
+        
+        /* ===== LOGIN CONTAINER ===== */
         .login-container {
-            background: #1a1a2e;
-            padding: 40px;
+            background: var(--bg-secondary);
+            padding: 45px 40px;
             border-radius: 12px;
-            border: 1px solid #333;
-            max-width: 400px;
+            border: 1px solid var(--border-color);
+            max-width: 420px;
             width: 90%;
+            box-shadow: 0 20px 60px var(--shadow);
+            transition: all 0.3s;
         }
-        .login-container h1 {
-            color: #e50914;
+        .login-container .logo {
             text-align: center;
             margin-bottom: 10px;
         }
-        .login-container p {
-            color: #888;
+        .login-container .logo h1 {
+            color: var(--accent);
+            font-size: 2rem;
+            letter-spacing: -1px;
+        }
+        .login-container .logo .subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        .login-container .lock-icon {
             text-align: center;
-            margin-bottom: 30px;
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .login-container h2 {
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 5px;
+            font-size: 1.3rem;
+        }
+        .login-container .desc {
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 25px;
             font-size: 0.9rem;
         }
+        
+        /* ===== FORM ===== */
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
         .form-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             font-weight: bold;
             font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .form-group label .required {
+            color: var(--accent);
         }
         .form-group input {
             width: 100%;
-            padding: 12px;
-            border: none;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
             border-radius: 6px;
-            background: #2a2a3e;
-            color: white;
+            background: var(--bg-hover);
+            color: var(--text-primary);
             font-size: 1rem;
+            transition: border-color 0.3s;
         }
         .form-group input:focus {
-            outline: 2px solid #e50914;
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.2);
         }
+        .form-group input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        /* ===== BUTTONS ===== */
         .btn-submit {
             width: 100%;
-            padding: 12px;
+            padding: 13px;
             border: none;
             border-radius: 6px;
-            background: #e50914;
+            background: var(--accent);
             color: white;
             font-weight: bold;
             font-size: 1rem;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: background 0.3s, transform 0.2s;
         }
         .btn-submit:hover {
-            background: #ff0a1a;
+            background: var(--accent-hover);
+            transform: scale(1.01);
         }
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+        .btn-submit .icon {
+            margin-right: 8px;
+        }
+        
+        /* ===== FLASH MESSAGES ===== */
         .flash {
-            padding: 10px;
+            padding: 12px 15px;
             border-radius: 6px;
             margin-bottom: 15px;
+            font-size: 0.9rem;
         }
         .flash.success {
             background: #1a3a1a;
-            color: #00ff00;
-            border: 1px solid #00ff00;
+            color: var(--success);
+            border: 1px solid var(--success);
         }
         .flash.error {
             background: #3a1a1a;
             color: #ff4444;
             border: 1px solid #ff4444;
         }
-        .back-link {
-            display: block;
+        
+        /* ===== LINKS ===== */
+        .links {
             text-align: center;
-            color: #888;
-            text-decoration: none;
-            margin-top: 15px;
-            font-size: 0.9rem;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
         }
-        .back-link:hover {
-            color: #e50914;
+        .links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+        .links a:hover {
+            color: var(--accent);
+        }
+        .links .home-link {
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        /* ===== THEME TOGGLE ===== */
+        .theme-toggle-wrapper {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+        .theme-toggle-wrapper button {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .theme-toggle-wrapper button:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+        
+        /* ===== SECURITY BADGE ===== */
+        .security-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+        .security-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 480px) {
+            .login-container { padding: 30px 20px; }
+            .login-container .logo h1 { font-size: 1.5rem; }
+            .theme-toggle-wrapper { top: 10px; right: 10px; }
+            .theme-toggle-wrapper button { padding: 5px 12px; font-size: 0.8rem; }
         }
     </style>
 </head>
-<body>
+<body data-theme="{{ theme }}">
+
+    <!-- ===== THEME TOGGLE ===== -->
+    <div class="theme-toggle-wrapper">
+        <button onclick="toggleTheme()">
+            {% if theme == 'dark' %}☀️ Light{% else %}🌙 Dark{% endif %}
+        </button>
+    </div>
+
+    <!-- ===== LOGIN CONTAINER ===== -->
     <div class="login-container">
-        <h1>🔐 Admin Login</h1>
-        <p>Access the admin panel</p>
+        <div class="logo">
+            <h1>🎬 Movie FTP</h1>
+            <div class="subtitle">Admin Panel</div>
+        </div>
         
+        <span class="lock-icon">🔐</span>
+        <h2>Admin Login</h2>
+        <p class="desc">Enter your credentials to access the admin dashboard</p>
+        
+        <!-- ===== FLASH MESSAGES ===== -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -111,19 +270,89 @@
             {% endif %}
         {% endwith %}
         
-        <form method="POST" action="/admin/login">
+        <!-- ===== LOGIN FORM ===== -->
+        <form method="POST" action="/admin/login" id="loginForm">
             <div class="form-group">
-                <label>Username</label>
-                <input type="text" name="username" required>
+                <label>Username <span class="required">*</span></label>
+                <input type="text" name="username" placeholder="Enter admin username" required autocomplete="username">
             </div>
             <div class="form-group">
-                <label>Password</label>
-                <input type="password" name="password" required>
+                <label>Password <span class="required">*</span></label>
+                <input type="password" name="password" placeholder="Enter admin password" required autocomplete="current-password">
             </div>
-            <button type="submit" class="btn-submit">Login</button>
+            
+            <button type="submit" class="btn-submit" id="loginBtn">
+                <span class="icon">🔑</span> Login
+            </button>
         </form>
         
-        <a href="/" class="back-link">← Back to home</a>
+        <div class="links">
+            <a href="/" class="home-link">← Back to home</a>
+        </div>
+        
+        <div class="security-badge">
+            <span class="dot"></span>
+            Secure Admin Access
+        </div>
     </div>
+
+    <script>
+        // ===== THEME TOGGLE =====
+        function toggleTheme() {
+            fetch('/toggle-theme')
+                .then(() => location.reload());
+        }
+
+        // ===== LOGIN FORM HANDLING =====
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const btn = document.getElementById('loginBtn');
+            btn.innerHTML = '⏳ Logging in...';
+            btn.disabled = true;
+            // Form will submit normally, button text will reset on page load
+        });
+
+        // ===== KEYBOARD SHORTCUTS =====
+        document.addEventListener('keydown', function(e) {
+            // Enter key on form submits automatically
+            // Escape key clears form
+            if (e.key === 'Escape') {
+                document.querySelector('input[name="username"]').value = '';
+                document.querySelector('input[name="password"]').value = '';
+            }
+        });
+
+        // ===== AUTO-FOCUS ON USERNAME FIELD =====
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('input[name="username"]').focus();
+        });
+
+        // ===== SHOW/HIDE PASSWORD (Optional) =====
+        // Uncomment below if you want show/hide password toggle
+        /*
+        const passwordInput = document.querySelector('input[name="password"]');
+        const toggleBtn = document.createElement('button');
+        toggleBtn.type = 'button';
+        toggleBtn.textContent = '👁️';
+        toggleBtn.style.cssText = `
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 5px;
+        `;
+        passwordInput.parentElement.style.position = 'relative';
+        passwordInput.parentElement.appendChild(toggleBtn);
+        
+        toggleBtn.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+        */
+    </script>
 </body>
 </html>
