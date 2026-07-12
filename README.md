@@ -12,5 +12,6 @@ A beautiful web interface to browse, stream, and download movies from an FTP ser
 - 🚀 Fast and lightweight
 
 ## FTP Server Structure
+website link:
+https://myftp.onrender.com/
 
-Your FTP server should have this folder structure:
