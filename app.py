@@ -14,6 +14,10 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', secrets.token_hex(32))
 CORS(app)
 
+# ===== IMPORTANT FIX: Make get_movie_listing available in templates =====
+# The function must be defined BEFORE this line
+# So move this AFTER the function definition
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -27,7 +31,6 @@ ADMIN_TOKEN = os.getenv('ADMIN_TOKEN', 'admin123')
 
 # ===== MOVIE CATEGORIES =====
 MOVIE_CATEGORIES = [
-    # Regular categories
     {'id': 'action', 'name': 'Action', 'icon': '🎬'},
     {'id': 'comedy', 'name': 'Comedy', 'icon': '😄'},
     {'id': 'drama', 'name': 'Drama', 'icon': '🎭'},
@@ -36,8 +39,6 @@ MOVIE_CATEGORIES = [
     {'id': 'romance', 'name': 'Romance', 'icon': '❤️'},
     {'id': 'documentary', 'name': 'Documentary', 'icon': '📹'},
     {'id': 'anime', 'name': 'Anime', 'icon': '🎌'},
-    
-    # Adult category - JUST ONE
     {'id': 'adult', 'name': 'Adult 18+', 'icon': '🔞'},
 ]
 
@@ -194,6 +195,9 @@ def get_movie_listing(category):
         logger.error(f"Error getting movies for {category}: {e}")
         return MOCK_MOVIES.get(category, [])
 
+# ===== IMPORTANT: Make get_movie_listing available in templates =====
+app.jinja_env.globals.update(get_movie_listing=get_movie_listing)
+
 def upload_file_to_ftp(local_path, remote_path):
     try:
         ftp = get_ftp_connection()
@@ -215,7 +219,6 @@ def upload_file_to_ftp(local_path, remote_path):
 
 @app.route('/')
 def index():
-    # Get featured movies (first 5 from action)
     featured = MOCK_MOVIES.get('action', [])[:5]
     return render_template('index.html', 
                          categories=MOVIE_CATEGORIES,
@@ -276,7 +279,7 @@ def search_movies():
             for movie in movies:
                 if query in movie['title'].lower():
                     results.append({**movie, 'category': category['id'], 'category_name': category['name']})
-    return render_template('search.html', 
+    return render_template('search_results.html', 
                          query=query, 
                          results=results,
                          categories=MOVIE_CATEGORIES,
@@ -286,7 +289,6 @@ def search_movies():
 
 @app.route('/api/login', methods=['POST'])
 def api_login():
-    """Hidden login API - only for upload modal"""
     data = request.json
     username = data.get('username', '').strip()
     password = data.get('password', '').strip()
@@ -314,7 +316,6 @@ def check_auth():
 
 @app.route('/api/upload', methods=['POST'])
 def api_upload():
-    """Upload movie - requires admin login"""
     if 'username' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
     
