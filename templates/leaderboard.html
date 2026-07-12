@@ -5,9 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leaderboard - Movie FTP</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; }
+        /* ===== THEME VARIABLES ===== */
+        :root {
+            --bg-primary: #141414;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #1a1a2e;
+            --bg-hover: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #e5e5e5;
+            --text-muted: #888888;
+            --border-color: #333333;
+            --accent: #e50914;
+            --accent-hover: #ff0a1a;
+            --shadow: rgba(0,0,0,0.8);
+            --success: #00ff00;
+            --gold: #ffd700;
+            --silver: #c0c0c0;
+            --bronze: #cd7f32;
+        }
         
+        [data-theme="light"] {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-hover: #e8e8e8;
+            --text-primary: #141414;
+            --text-secondary: #333333;
+            --text-muted: #666666;
+            --border-color: #dddddd;
+            --shadow: rgba(0,0,0,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+
+        /* ===== NAVBAR ===== */
         .navbar {
             position: fixed;
             top: 0;
@@ -18,51 +61,78 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #141414;
-            border-bottom: 1px solid #333;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
             flex-wrap: wrap;
             gap: 10px;
         }
         .navbar .brand a {
-            color: #e50914;
+            color: var(--accent);
             text-decoration: none;
             font-size: 1.5rem;
             font-weight: bold;
         }
-        .navbar .nav-right a {
-            color: #e5e5e5;
-            text-decoration: none;
-            margin-left: 20px;
+        .navbar .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
-        .navbar .nav-right a:hover { color: #fff; }
+        .navbar .nav-right a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .navbar .nav-right a:hover { color: var(--text-primary); }
+        .navbar .nav-right .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .navbar .nav-right .theme-toggle:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
         
+        /* ===== CONTAINER ===== */
         .container {
             max-width: 900px;
             margin: 0 auto;
             padding: 80px 30px 30px;
         }
         
+        /* ===== HEADER ===== */
         .leaderboard-header {
             text-align: center;
             margin-bottom: 40px;
         }
+        .leaderboard-header .trophy {
+            font-size: 4rem;
+            display: block;
+            margin-bottom: 10px;
+        }
         .leaderboard-header h1 {
             font-size: 2.5rem;
-            color: #ffd700;
+            color: var(--gold);
         }
         .leaderboard-header p {
-            color: #888;
+            color: var(--text-muted);
             margin-top: 5px;
         }
         .leaderboard-header .live-badge {
             display: inline-block;
-            background: #00ff00;
+            background: var(--success);
             color: #141414;
-            padding: 2px 12px;
+            padding: 2px 14px;
             border-radius: 12px;
             font-size: 0.7rem;
             font-weight: bold;
             animation: pulse 1.5s infinite;
+            margin-top: 8px;
         }
         @keyframes pulse {
             0% { opacity: 1; }
@@ -70,32 +140,62 @@
             100% { opacity: 1; }
         }
         
+        /* ===== TIME FILTERS ===== */
+        .filter-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .filter-tabs button {
+            padding: 8px 25px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .filter-tabs button:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+        .filter-tabs button.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        
+        /* ===== LEADERBOARD LIST ===== */
         .leaderboard-list {
-            background: #1a1a2e;
+            background: var(--bg-secondary);
             border-radius: 12px;
-            border: 1px solid #333;
+            border: 1px solid var(--border-color);
             overflow: hidden;
         }
         .lb-header {
             display: grid;
-            grid-template-columns: 50px 80px 1fr 120px;
+            grid-template-columns: 60px 70px 1fr 120px;
             padding: 15px 20px;
-            background: #2a2a3e;
-            border-bottom: 1px solid #333;
+            background: var(--bg-hover);
+            border-bottom: 1px solid var(--border-color);
             font-weight: bold;
-            color: #888;
+            color: var(--text-muted);
             font-size: 0.9rem;
         }
         .lb-row {
             display: grid;
-            grid-template-columns: 50px 80px 1fr 120px;
+            grid-template-columns: 60px 70px 1fr 120px;
             padding: 15px 20px;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid var(--border-color);
             transition: background 0.3s;
             align-items: center;
         }
         .lb-row:hover {
-            background: #2a2a3e;
+            background: var(--bg-hover);
         }
         .lb-row:last-child {
             border-bottom: none;
@@ -103,88 +203,192 @@
         .lb-row .rank {
             font-weight: bold;
             font-size: 1.1rem;
+            text-align: center;
         }
-        .lb-row .rank.gold { color: #ffd700; }
-        .lb-row .rank.silver { color: #c0c0c0; }
-        .lb-row .rank.bronze { color: #cd7f32; }
+        .lb-row .rank.gold { color: var(--gold); font-size: 1.3rem; }
+        .lb-row .rank.silver { color: var(--silver); font-size: 1.2rem; }
+        .lb-row .rank.bronze { color: var(--bronze); font-size: 1.2rem; }
+        .lb-row .rank .medal {
+            display: block;
+            font-size: 1.5rem;
+        }
         
         .lb-row .avatar {
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: #2a2a3e;
+            background: var(--bg-hover);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.3rem;
             font-weight: bold;
-            color: #fff;
+            color: var(--text-primary);
+            overflow: hidden;
+            margin: 0 auto;
         }
         .lb-row .avatar img {
             width: 100%;
             height: 100%;
-            border-radius: 50%;
             object-fit: cover;
         }
         .lb-row .name {
             font-weight: bold;
             font-size: 1.05rem;
         }
+        .lb-row .name .sub-text {
+            color: var(--text-muted);
+            font-weight: normal;
+            font-size: 0.8rem;
+            display: block;
+        }
         .lb-row .views {
-            color: #ffd700;
+            color: var(--gold);
             font-weight: bold;
             font-size: 1.05rem;
+            text-align: right;
+        }
+        .lb-row .views .views-label {
+            color: var(--text-muted);
+            font-weight: normal;
+            font-size: 0.7rem;
+            display: block;
         }
         
+        /* ===== EMPTY STATE ===== */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
-            color: #666;
+            color: var(--text-muted);
         }
         .empty-state .icon { font-size: 4rem; display: block; margin-bottom: 20px; }
+        .empty-state h2 { color: var(--text-secondary); margin-bottom: 10px; }
         
+        /* ===== USER COUNT ===== */
+        .user-count {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+        .user-count span {
+            color: var(--text-primary);
+            font-weight: bold;
+        }
+        
+        /* ===== BACK LINK ===== */
         .back-link {
             display: inline-block;
-            color: #e50914;
+            color: var(--accent);
             text-decoration: none;
             margin-bottom: 20px;
+            transition: color 0.3s;
         }
-        .back-link:hover { text-decoration: underline; }
+        .back-link:hover {
+            text-decoration: underline;
+        }
         
+        /* ===== ANIMATIONS ===== */
+        .lb-row {
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+        .lb-row:nth-child(1) { animation-delay: 0.05s; }
+        .lb-row:nth-child(2) { animation-delay: 0.1s; }
+        .lb-row:nth-child(3) { animation-delay: 0.15s; }
+        .lb-row:nth-child(4) { animation-delay: 0.2s; }
+        .lb-row:nth-child(5) { animation-delay: 0.25s; }
+        .lb-row:nth-child(6) { animation-delay: 0.3s; }
+        .lb-row:nth-child(7) { animation-delay: 0.35s; }
+        .lb-row:nth-child(8) { animation-delay: 0.4s; }
+        .lb-row:nth-child(9) { animation-delay: 0.45s; }
+        .lb-row:nth-child(10) { animation-delay: 0.5s; }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .container { padding: 70px 15px 20px; }
             .lb-header { display: none; }
             .lb-row {
-                grid-template-columns: 40px 60px 1fr 80px;
+                grid-template-columns: 50px 60px 1fr 80px;
                 padding: 12px 15px;
                 gap: 5px;
+                font-size: 0.9rem;
             }
             .lb-row .avatar { width: 40px; height: 40px; font-size: 1rem; }
             .lb-row .name { font-size: 0.9rem; }
             .lb-row .views { font-size: 0.9rem; }
+            .lb-row .rank .medal { font-size: 1.2rem; }
             .leaderboard-header h1 { font-size: 1.8rem; }
+            .filter-tabs button { padding: 6px 16px; font-size: 0.8rem; }
+            .navbar { padding: 10px 15px; }
+        }
+        @media (max-width: 480px) {
+            .lb-row {
+                grid-template-columns: 40px 50px 1fr 60px;
+                padding: 10px 10px;
+                font-size: 0.8rem;
+            }
+            .lb-row .avatar { width: 35px; height: 35px; font-size: 0.8rem; }
+            .lb-row .views { font-size: 0.8rem; }
         }
     </style>
 </head>
-<body>
+<body data-theme="{{ theme }}">
+
+    <!-- ===== NAVBAR ===== -->
     <nav class="navbar">
         <div class="brand"><a href="/">🎬 Movie FTP</a></div>
         <div class="nav-right">
+            <button class="theme-toggle" onclick="toggleTheme()">
+                {% if theme == 'dark' %}☀️ Light{% else %}🌙 Dark{% endif %}
+            </button>
             <a href="/">Home</a>
-            <a href="/dashboard">Dashboard</a>
+            {% if logged_in %}
+                <a href="/dashboard">Dashboard</a>
+                <a href="/logout">Logout</a>
+            {% else %}
+                <a href="/login">Login</a>
+            {% endif %}
         </div>
     </nav>
 
+    <!-- ===== CONTAINER ===== -->
     <div class="container">
+        
+        <!-- ===== BACK LINK ===== -->
         <a href="/" class="back-link">← Back to home</a>
         
+        <!-- ===== HEADER ===== -->
         <div class="leaderboard-header">
-            <h1>🏆 Leaderboard</h1>
+            <span class="trophy">🏆</span>
+            <h1>Leaderboard</h1>
             <p>Top creators based on total video views</p>
-            <p style="margin-top:10px;"><span class="live-badge">● LIVE</span> Updates every second</p>
+            <div style="margin-top:10px;">
+                <span class="live-badge">● LIVE</span>
+                <span style="color: var(--text-muted); font-size:0.8rem; margin-left:10px;">Updates every second</span>
+            </div>
         </div>
 
-        <div class="leaderboard-list">
+        <!-- ===== TIME FILTERS ===== -->
+        <div class="filter-tabs">
+            <button class="active" data-filter="all" onclick="setFilter('all', this)">🏆 All Time</button>
+            <button data-filter="month" onclick="setFilter('month', this)">📅 This Month</button>
+            <button data-filter="week" onclick="setFilter('week', this)">📅 This Week</button>
+        </div>
+
+        <!-- ===== LEADERBOARD ===== -->
+        <div class="leaderboard-list" id="leaderboardList">
             <div class="lb-header">
                 <span>Rank</span>
                 <span>Avatar</span>
@@ -198,29 +402,67 @@
                 </div>
             </div>
         </div>
+
+        <!-- ===== USER COUNT ===== -->
+        <div class="user-count">
+            Showing top <span id="totalUsers">0</span> creators
+        </div>
     </div>
 
     <script>
+        let currentFilter = 'all';
         let previousLeaderboard = [];
+        let isUpdating = false;
 
-        function fetchLeaderboard() {
-            fetch('/api/leaderboard')
+        // ===== THEME TOGGLE =====
+        function toggleTheme() {
+            fetch('/toggle-theme')
+                .then(() => location.reload());
+        }
+
+        // ===== SET FILTER =====
+        function setFilter(filter, button) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-tabs button').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            // Show loading state
+            document.getElementById('leaderboardRows').innerHTML = `
+                <div class="empty-state">
+                    <span class="icon">⏳</span>
+                    <h2>Loading ${filter} data...</h2>
+                </div>
+            `;
+            
+            fetchLeaderboard(filter);
+        }
+
+        // ===== FETCH LEADERBOARD =====
+        function fetchLeaderboard(filter = currentFilter) {
+            if (isUpdating) return;
+            isUpdating = true;
+
+            fetch(`/api/leaderboard?filter=${filter}`)
                 .then(r => r.json())
                 .then(data => {
                     const leaderboard = data.leaderboard || [];
                     renderLeaderboard(leaderboard);
+                    document.getElementById('totalUsers').textContent = leaderboard.length;
+                    isUpdating = false;
                 })
                 .catch(() => {
                     document.getElementById('leaderboardRows').innerHTML = `
                         <div class="empty-state">
                             <span class="icon">😕</span>
-                            <h2>Error loading</h2>
+                            <h2>Error loading data</h2>
                             <p>Please refresh the page.</p>
                         </div>
                     `;
+                    isUpdating = false;
                 });
         }
 
+        // ===== RENDER LEADERBOARD =====
         function renderLeaderboard(leaderboard) {
             if (leaderboard.length === 0) {
                 document.getElementById('leaderboardRows').innerHTML = `
@@ -228,52 +470,95 @@
                         <span class="icon">📭</span>
                         <h2>No users yet</h2>
                         <p>Be the first to upload and get on the leaderboard!</p>
+                        <a href="/register" style="color: var(--accent); text-decoration: none; margin-top: 10px; display: inline-block;">📝 Register now</a>
                     </div>
                 `;
                 return;
             }
 
             let html = '';
-            leaderboard.forEach((user, index) => {
-                let rankClass = '';
-                if (index === 0) rankClass = 'gold';
-                else if (index === 1) rankClass = 'silver';
-                else if (index === 2) rankClass = 'bronze';
+            const medals = ['🥇', '🥈', '🥉'];
+            const rankClasses = ['gold', 'silver', 'bronze'];
 
-                const initial = user.username ? user.username[0].toUpperCase() : '?';
+            leaderboard.forEach((user, index) => {
+                const rankClass = index < 3 ? rankClasses[index] : '';
+                const medal = index < 3 ? medals[index] : `#${index + 1}`;
                 const avatarHtml = user.profile_pic 
                     ? `<img src="${user.profile_pic}" alt="${user.username}">` 
-                    : initial;
+                    : (user.username ? user.username[0].toUpperCase() : '?');
+
+                // Check if rank changed (for animation)
+                let rankChange = '';
+                if (previousLeaderboard.length > index) {
+                    const prevIndex = previousLeaderboard.findIndex(u => u.username === user.username);
+                    if (prevIndex !== -1 && prevIndex !== index) {
+                        rankChange = prevIndex < index ? '↓' : '↑';
+                    }
+                }
 
                 html += `
-                    <div class="lb-row">
-                        <span class="rank ${rankClass}">#${index + 1}</span>
+                    <div class="lb-row" data-username="${user.username}">
+                        <span class="rank ${rankClass}">
+                            ${index < 3 ? `<span class="medal">${medal}</span>` : medal}
+                            ${rankChange ? `<span style="font-size:0.7rem;color:${rankChange === '↑' ? 'var(--success)' : 'var(--accent)'};">${rankChange}</span>` : ''}
+                        </span>
                         <div class="avatar">${avatarHtml}</div>
-                        <span class="name">${user.username}</span>
-                        <span class="views">${user.total_views}</span>
+                        <div class="name">
+                            ${user.username}
+                            <span class="sub-text">${user.total_uploads || 0} uploads</span>
+                        </div>
+                        <div class="views">
+                            ${user.total_views}
+                            <span class="views-label">total views</span>
+                        </div>
                     </div>
                 `;
             });
-            document.getElementById('leaderboardRows').innerHTML = html;
 
-            // Animate changes
-            const rows = document.querySelectorAll('.lb-row');
-            rows.forEach((row, i) => {
-                if (i < previousLeaderboard.length) {
-                    const prevRank = previousLeaderboard.findIndex(u => u.username === leaderboard[i].username);
-                    if (prevRank !== -1 && prevRank !== i) {
-                        row.style.transition = 'background 0.3s';
-                        row.style.background = '#2a3a2a';
-                        setTimeout(() => { row.style.background = ''; }, 500);
-                    }
-                }
-            });
+            document.getElementById('leaderboardRows').innerHTML = html;
             previousLeaderboard = leaderboard;
         }
 
-        // ===== UPDATE EVERY SECOND =====
-        fetchLeaderboard();
-        setInterval(fetchLeaderboard, 1000);
+        // ===== AUTO-REFRESH EVERY SECOND =====
+        let refreshInterval = setInterval(() => {
+            fetchLeaderboard(currentFilter);
+        }, 1000);
+
+        // ===== STOP REFRESH WHEN PAGE NOT VISIBLE =====
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                clearInterval(refreshInterval);
+            } else {
+                refreshInterval = setInterval(() => {
+                    fetchLeaderboard(currentFilter);
+                }, 1000);
+            }
+        });
+
+        // ===== KEYBOARD SHORTCUTS =====
+        document.addEventListener('keydown', function(e) {
+            // 1 = All Time, 2 = Month, 3 = Week
+            if (e.key === '1') {
+                document.querySelector('[data-filter="all"]')?.click();
+            } else if (e.key === '2') {
+                document.querySelector('[data-filter="month"]')?.click();
+            } else if (e.key === '3') {
+                document.querySelector('[data-filter="week"]')?.click();
+            }
+            // R = Refresh
+            if (e.key === 'r' || e.key === 'R') {
+                if (e.ctrlKey || e.metaKey) return;
+                e.preventDefault();
+                fetchLeaderboard(currentFilter);
+            }
+        });
+
+        // ===== INIT =====
+        fetchLeaderboard('all');
+
+        // Show keyboard shortcuts hint
+        console.log('🎬 Keyboard Shortcuts:');
+        console.log('  1 = All Time  2 = This Month  3 = This Week  R = Refresh');
     </script>
 </body>
 </html>
