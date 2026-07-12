@@ -8,7 +8,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #0a0a0a; color: #e0e0e0; }
         
-        /* Top Navigation Bar */
         .top-nav {
             background: #1a1a2e;
             padding: 10px 30px;
@@ -24,9 +23,6 @@
             text-decoration: none;
             font-size: 1.2rem;
             font-weight: bold;
-        }
-        .top-nav .brand a:hover {
-            text-decoration: underline;
         }
         .top-nav .user-links {
             display: flex;
@@ -64,24 +60,92 @@
         .search-bar input:focus { outline: 2px solid #e50914; }
         .search-bar button { padding: 12px 30px; border: none; border-radius: 30px; background: #e50914; color: white; font-weight: bold; cursor: pointer; }
         .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
-        .categories-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; margin-top: 30px; }
-        .category-card { background: linear-gradient(135deg, #1a1a2e, #2a2a4e); padding: 30px 20px; border-radius: 15px; text-align: center; text-decoration: none; color: inherit; border: 1px solid #333; transition: all 0.3s; }
-        .category-card:hover { transform: translateY(-10px); border-color: #e50914; }
+        
+        .section-title {
+            color: #fff;
+            font-size: 1.5rem;
+            margin: 30px 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #333;
+        }
+        .section-title .adult-badge {
+            background: #e50914;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 12px;
+            border-radius: 12px;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+        
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 25px;
+            margin-top: 15px;
+        }
+        .category-card {
+            background: linear-gradient(135deg, #1a1a2e, #2a2a4e);
+            padding: 30px 20px;
+            border-radius: 15px;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid #333;
+            transition: all 0.3s;
+        }
+        .category-card:hover {
+            transform: translateY(-10px);
+            border-color: #e50914;
+        }
         .category-card .icon { font-size: 3.5rem; display: block; margin-bottom: 15px; }
         .category-card .name { font-size: 1.2rem; font-weight: bold; }
-        .footer { text-align: center; padding: 30px; color: #555; border-top: 1px solid #222; margin-top: 40px; }
+        
+        .category-card.adult {
+            border-color: #e50914;
+            background: linear-gradient(135deg, #2a0a0a, #3a0a0a);
+        }
+        .category-card.adult:hover {
+            border-color: #ff4444;
+            box-shadow: 0 0 30px rgba(229, 9, 20, 0.3);
+            transform: translateY(-10px);
+        }
+        .category-card.adult .name {
+            color: #ff4444;
+        }
+        .category-card.adult .adult-tag {
+            font-size: 0.7rem;
+            color: #ff4444;
+            margin-top: 5px;
+            font-weight: bold;
+            background: rgba(229, 9, 20, 0.2);
+            padding: 2px 10px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #555;
+            border-top: 1px solid #222;
+            margin-top: 40px;
+        }
+        .footer .adult-disclaimer {
+            color: #666;
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
         
         @media (max-width: 768px) {
             .header h1 { font-size: 1.8rem; }
             .categories-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
             .top-nav { padding: 10px 15px; }
             .top-nav .user-links { gap: 10px; }
-            .top-nav .user-links a { font-size: 0.85rem; }
         }
     </style>
 </head>
 <body>
-    <!-- ===== NEW TOP NAVIGATION BAR ===== -->
     <div class="top-nav">
         <div class="brand">
             <a href="/">🎬 Movie FTP</a>
@@ -100,7 +164,6 @@
         </div>
     </div>
     
-    <!-- ===== HEADER SECTION ===== -->
     <div class="header">
         <h1>🎬 Movie FTP Server</h1>
         <p>Browse, stream, and download movies from our FTP archive</p>
@@ -110,21 +173,41 @@
         </form>
     </div>
     
-    <!-- ===== CATEGORIES ===== -->
     <div class="container">
-        <h2>📂 Browse Categories</h2>
+        <!-- Regular Categories -->
+        <div class="section-title">📂 Categories</div>
         <div class="categories-grid">
             {% for category in categories %}
-            <a href="/category/{{ category.id }}" class="category-card">
-                <span class="icon">{{ category.icon }}</span>
-                <div class="name">{{ category.name }}</div>
-            </a>
+                {% if not category.adult %}
+                <a href="/category/{{ category.id }}" class="category-card">
+                    <span class="icon">{{ category.icon }}</span>
+                    <div class="name">{{ category.name }}</div>
+                </a>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Adult (18+) Categories -->
+        <div class="section-title">
+            🔞 Adult Content 
+            <span class="adult-badge">18+</span>
+        </div>
+        <div class="categories-grid">
+            {% for category in categories %}
+                {% if category.adult %}
+                <a href="/category/{{ category.id }}" class="category-card adult">
+                    <span class="icon">{{ category.icon }}</span>
+                    <div class="name">{{ category.name }}</div>
+                    <span class="adult-tag">🔞 18+</span>
+                </a>
+                {% endif %}
             {% endfor %}
         </div>
     </div>
     
     <div class="footer">
         <p>📁 Movie FTP Server | All movies are hosted on our FTP archive</p>
+        <p class="adult-disclaimer">🔞 Adult content is clearly marked. By accessing, you confirm you are 18+.</p>
         <p style="font-size: 0.8rem; margin-top: 5px; color: #444;">
             {% if logged_in %}
                 Logged in as <strong style="color: #00ff00;">{{ session['username'] if session else 'User' }}</strong>
