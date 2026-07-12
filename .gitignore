@@ -1,4 +1,4 @@
-# Environment variables
+# Environment variables (DON'T commit these!)
 .env
 .env.local
 .env.*.local
@@ -24,17 +24,29 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+venv/
+env/
+.venv/
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# FTP Storage
-/tmp/
-users.json
+*.sublime*
 
 # OS
 .DS_Store
 Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# User data (don't commit)
+users.json
