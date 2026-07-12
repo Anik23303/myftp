@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Movie FTP</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #0a0a0a; color: #e0e0e0; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .login-container { background: #1a1a2e; padding: 40px; border-radius: 15px; border: 1px solid #333; max-width: 400px; width: 100%; }
+        .login-container h1 { text-align: center; margin-bottom: 30px; color: #e50914; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input { width: 100%; padding: 12px; border: none; border-radius: 8px; background: #2a2a3e; color: white; font-size: 16px; }
+        .form-group input:focus { outline: 2px solid #e50914; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 8px; background: #e50914; color: white; font-weight: bold; font-size: 16px; cursor: pointer; transition: transform 0.2s; }
+        button:hover { transform: scale(1.02); }
+        .flash { padding: 10px; border-radius: 8px; margin-bottom: 15px; }
+        .flash.success { background: #1a3a1a; color: #00ff00; border: 1px solid #00ff00; }
+        .flash.error { background: #3a1a1a; color: #ff4444; border: 1px solid #ff4444; }
+        .links { text-align: center; margin-top: 20px; }
+        .links a { color: #e50914; text-decoration: none; }
+        .links a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>🔐 Login</h1>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST">
+            <div class="form-group">
+                <label>Username:</label>
+                <input type="text" name="username" required>
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" name="password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        
+        <div class="links">
+            <a href="/register">Don't have an account? Register</a><br>
+            <a href="/">← Back to home</a>
+        </div>
+    </div>
+</body>
+</html>
