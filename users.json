@@ -1,0 +1,23 @@
+{
+    "admin": {
+        "password": "admin123",
+        "role": "admin",
+        "created_at": "2026-07-13T10:30:00.123456",
+        "profile_pic": "/static/uploads/admin_abc123.jpg",
+        "total_views": 0
+    },
+    "john_doe": {
+        "password": "johnspass123",
+        "role": "user",
+        "created_at": "2026-07-13T11:45:00.654321",
+        "profile_pic": "/static/uploads/john_doe_xyz789.jpg",
+        "total_views": 150
+    },
+    "jane_smith": {
+        "password": "janespass456",
+        "role": "user",
+        "created_at": "2026-07-13T14:20:00.987654",
+        "profile_pic": "",
+        "total_views": 320
+    }
+}
