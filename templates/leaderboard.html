@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard - Movie FTP</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; }
+        
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 10px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #141414;
+            border-bottom: 1px solid #333;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .navbar .brand a {
+            color: #e50914;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .navbar .nav-right a {
+            color: #e5e5e5;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+        .navbar .nav-right a:hover { color: #fff; }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 80px 30px 30px;
+        }
+        
+        .leaderboard-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .leaderboard-header h1 {
+            font-size: 2.5rem;
+            color: #ffd700;
+        }
+        .leaderboard-header p {
+            color: #888;
+            margin-top: 5px;
+        }
+        .leaderboard-header .live-badge {
+            display: inline-block;
+            background: #00ff00;
+            color: #141414;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .leaderboard-list {
+            background: #1a1a2e;
+            border-radius: 12px;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+        .lb-header {
+            display: grid;
+            grid-template-columns: 50px 80px 1fr 120px;
+            padding: 15px 20px;
+            background: #2a2a3e;
+            border-bottom: 1px solid #333;
+            font-weight: bold;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        .lb-row {
+            display: grid;
+            grid-template-columns: 50px 80px 1fr 120px;
+            padding: 15px 20px;
+            border-bottom: 1px solid #333;
+            transition: background 0.3s;
+            align-items: center;
+        }
+        .lb-row:hover {
+            background: #2a2a3e;
+        }
+        .lb-row:last-child {
+            border-bottom: none;
+        }
+        .lb-row .rank {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .lb-row .rank.gold { color: #ffd700; }
+        .lb-row .rank.silver { color: #c0c0c0; }
+        .lb-row .rank.bronze { color: #cd7f32; }
+        
+        .lb-row .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #2a2a3e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #fff;
+        }
+        .lb-row .avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .lb-row .name {
+            font-weight: bold;
+            font-size: 1.05rem;
+        }
+        .lb-row .views {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 1.05rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        .empty-state .icon { font-size: 4rem; display: block; margin-bottom: 20px; }
+        
+        .back-link {
+            display: inline-block;
+            color: #e50914;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+        .back-link:hover { text-decoration: underline; }
+        
+        @media (max-width: 768px) {
+            .container { padding: 70px 15px 20px; }
+            .lb-header { display: none; }
+            .lb-row {
+                grid-template-columns: 40px 60px 1fr 80px;
+                padding: 12px 15px;
+                gap: 5px;
+            }
+            .lb-row .avatar { width: 40px; height: 40px; font-size: 1rem; }
+            .lb-row .name { font-size: 0.9rem; }
+            .lb-row .views { font-size: 0.9rem; }
+            .leaderboard-header h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="brand"><a href="/">🎬 Movie FTP</a></div>
+        <div class="nav-right">
+            <a href="/">Home</a>
+            <a href="/dashboard">Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <a href="/" class="back-link">← Back to home</a>
+        
+        <div class="leaderboard-header">
+            <h1>🏆 Leaderboard</h1>
+            <p>Top creators based on total video views</p>
+            <p style="margin-top:10px;"><span class="live-badge">● LIVE</span> Updates every second</p>
+        </div>
+
+        <div class="leaderboard-list">
+            <div class="lb-header">
+                <span>Rank</span>
+                <span>Avatar</span>
+                <span>Username</span>
+                <span>Total Views</span>
+            </div>
+            <div id="leaderboardRows">
+                <div class="empty-state">
+                    <span class="icon">⏳</span>
+                    <h2>Loading leaderboard...</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let previousLeaderboard = [];
+
+        function fetchLeaderboard() {
+            fetch('/api/leaderboard')
+                .then(r => r.json())
+                .then(data => {
+                    const leaderboard = data.leaderboard || [];
+                    renderLeaderboard(leaderboard);
+                })
+                .catch(() => {
+                    document.getElementById('leaderboardRows').innerHTML = `
+                        <div class="empty-state">
+                            <span class="icon">😕</span>
+                            <h2>Error loading</h2>
+                            <p>Please refresh the page.</p>
+                        </div>
+                    `;
+                });
+        }
+
+        function renderLeaderboard(leaderboard) {
+            if (leaderboard.length === 0) {
+                document.getElementById('leaderboardRows').innerHTML = `
+                    <div class="empty-state">
+                        <span class="icon">📭</span>
+                        <h2>No users yet</h2>
+                        <p>Be the first to upload and get on the leaderboard!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            leaderboard.forEach((user, index) => {
+                let rankClass = '';
+                if (index === 0) rankClass = 'gold';
+                else if (index === 1) rankClass = 'silver';
+                else if (index === 2) rankClass = 'bronze';
+
+                const initial = user.username ? user.username[0].toUpperCase() : '?';
+                const avatarHtml = user.profile_pic 
+                    ? `<img src="${user.profile_pic}" alt="${user.username}">` 
+                    : initial;
+
+                html += `
+                    <div class="lb-row">
+                        <span class="rank ${rankClass}">#${index + 1}</span>
+                        <div class="avatar">${avatarHtml}</div>
+                        <span class="name">${user.username}</span>
+                        <span class="views">${user.total_views}</span>
+                    </div>
+                `;
+            });
+            document.getElementById('leaderboardRows').innerHTML = html;
+
+            // Animate changes
+            const rows = document.querySelectorAll('.lb-row');
+            rows.forEach((row, i) => {
+                if (i < previousLeaderboard.length) {
+                    const prevRank = previousLeaderboard.findIndex(u => u.username === leaderboard[i].username);
+                    if (prevRank !== -1 && prevRank !== i) {
+                        row.style.transition = 'background 0.3s';
+                        row.style.background = '#2a3a2a';
+                        setTimeout(() => { row.style.background = ''; }, 500);
+                    }
+                }
+            });
+            previousLeaderboard = leaderboard;
+        }
+
+        // ===== UPDATE EVERY SECOND =====
+        fetchLeaderboard();
+        setInterval(fetchLeaderboard, 1000);
+    </script>
+</body>
+</html>
