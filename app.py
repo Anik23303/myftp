@@ -28,11 +28,15 @@ FTP_USER = os.getenv('FTP_USER', 'anonymous')
 FTP_PASS = os.getenv('FTP_PASS', '')
 USERS_FILE = "users.json"
 VIDEOS_FILE = "videos.json"
+WATCH_HISTORY_FILE = "watch_history.json"
+MYLIST_FILE = "mylist.json"
 ADMIN_TOKEN = os.getenv('ADMIN_TOKEN', 'admin123')
 UPLOAD_FOLDER = "static/uploads"
+THUMBNAIL_FOLDER = "static/thumbnails"
 
-# Create upload folder if not exists
+# Create folders if not exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(THUMBNAIL_FOLDER, exist_ok=True)
 
 # ===== MOVIE CATEGORIES =====
 MOVIE_CATEGORIES = [
@@ -58,7 +62,8 @@ def load_users():
                 "role": "admin",
                 "created_at": datetime.now().isoformat(),
                 "profile_pic": "",
-                "total_views": 0
+                "total_views": 0,
+                "total_uploads": 0
             }
         }
         save_users(default_users)
@@ -83,6 +88,30 @@ def save_videos(videos):
     with open(VIDEOS_FILE, 'w') as f:
         json.dump(videos, f, indent=2)
 
+def load_watch_history():
+    """Load watch history"""
+    if not os.path.exists(WATCH_HISTORY_FILE):
+        return {}
+    with open(WATCH_HISTORY_FILE, 'r') as f:
+        return json.load(f)
+
+def save_watch_history(history):
+    """Save watch history"""
+    with open(WATCH_HISTORY_FILE, 'w') as f:
+        json.dump(history, f, indent=2)
+
+def load_mylist():
+    """Load My List (watch later)"""
+    if not os.path.exists(MYLIST_FILE):
+        return {}
+    with open(MYLIST_FILE, 'r') as f:
+        return json.load(f)
+
+def save_mylist(mylist):
+    """Save My List"""
+    with open(MYLIST_FILE, 'w') as f:
+        json.dump(mylist, f, indent=2)
+
 def get_user_videos(username):
     """Get all videos uploaded by a user"""
     videos = load_videos()
@@ -98,21 +127,46 @@ def get_user_total_views(username):
     return total
 
 def update_user_total_views(username):
-    """Update user's total views in users.json"""
+    """Update user's total views and uploads in users.json"""
     users = load_users()
     if username in users:
-        users[username]['total_views'] = get_user_total_views(username)
+        videos = get_user_videos(username)
+        users[username]['total_views'] = sum(v.get('views', 0) for v in videos.values())
+        users[username]['total_uploads'] = len(videos)
         save_users(users)
 
-def get_leaderboard():
-    """Get top 10 users by total views"""
+def get_leaderboard(time_filter='all'):
+    """Get top 10 users by total views with time filter"""
     users = load_users()
-    # Filter out admin and users with 0 views
-    user_list = [
-        {'username': u, 'total_views': data.get('total_views', 0), 'profile_pic': data.get('profile_pic', '')}
-        for u, data in users.items()
-        if u != 'admin' and data.get('role') != 'admin'
-    ]
+    videos = load_videos()
+    
+    # Filter users with role 'user'
+    user_list = []
+    for username, data in users.items():
+        if data.get('role') != 'admin' and username != 'admin':
+            # Calculate views based on time filter
+            total_views = 0
+            for vid in videos.values():
+                if vid.get('uploaded_by') == username:
+                    uploaded_at = datetime.fromisoformat(vid.get('uploaded_at', ''))
+                    now = datetime.now()
+                    
+                    if time_filter == 'week':
+                        if uploaded_at >= now - timedelta(days=7):
+                            total_views += vid.get('views', 0)
+                    elif time_filter == 'month':
+                        if uploaded_at >= now - timedelta(days=30):
+                            total_views += vid.get('views', 0)
+                    else:  # 'all'
+                        total_views += vid.get('views', 0)
+            
+            user_list.append({
+                'username': username,
+                'total_views': total_views,
+                'profile_pic': data.get('profile_pic', ''),
+                'total_uploads': data.get('total_uploads', 0)
+            })
+    
     # Sort by total views descending
     user_list.sort(key=lambda x: x['total_views'], reverse=True)
     return user_list[:10]
@@ -120,8 +174,11 @@ def get_leaderboard():
 def get_video_stats():
     """Get video statistics for admin dashboard"""
     videos = load_videos()
+    users = load_users()
+    
     total_videos = len(videos)
     total_views = sum(v.get('views', 0) for v in videos.values())
+    total_users = len([u for u in users.values() if u.get('role') != 'admin'])
     
     # Views per category
     category_views = {}
@@ -133,17 +190,17 @@ def get_video_stats():
     most_viewed = sorted(videos.values(), key=lambda x: x.get('views', 0), reverse=True)[:10]
     
     # User growth (last 7 days)
-    users = load_users()
     growth = []
-    for i in range(7, 0, -1):
+    for i in range(7, -1, -1):
         date = (datetime.now() - timedelta(days=i)).date().isoformat()
-        count = sum(1 for u in users.values() if u.get('created_at', '').startswith(date))
+        count = sum(1 for u in users.values() 
+                   if u.get('created_at', '').startswith(date) and u.get('role') != 'admin')
         growth.append({'date': date, 'count': count})
     
     return {
         'total_videos': total_videos,
         'total_views': total_views,
-        'total_users': len([u for u in load_users().values() if u.get('role') != 'admin']),
+        'total_users': total_users,
         'category_views': category_views,
         'most_viewed': most_viewed,
         'growth': growth
@@ -166,16 +223,118 @@ def increment_views(video_id):
         return True
     return False
 
+def generate_thumbnail(filename):
+    """Generate placeholder thumbnail (simplified)"""
+    # In production, you'd use ffmpeg or similar
+    # For now, return a colored gradient based on filename hash
+    import hashlib
+    hash_val = int(hashlib.md5(filename.encode()).hexdigest()[:8], 16)
+    colors = ['#e50914', '#ff6b35', '#00b4d8', '#7b2cbf', '#ffd700', '#06d6a0']
+    return colors[hash_val % len(colors)]
+
+def add_to_watch_history(username, video_id):
+    """Add video to user's watch history"""
+    history = load_watch_history()
+    if username not in history:
+        history[username] = []
+    
+    # Remove if already exists (move to top)
+    history[username] = [v for v in history[username] if v['video_id'] != video_id]
+    
+    # Add to top
+    history[username].insert(0, {
+        'video_id': video_id,
+        'watched_at': datetime.now().isoformat()
+    })
+    
+    # Keep only last 100 items
+    history[username] = history[username][:100]
+    save_watch_history(history)
+
+def add_to_mylist(username, video_id):
+    """Add video to user's My List"""
+    mylist = load_mylist()
+    if username not in mylist:
+        mylist[username] = []
+    
+    # Check if already exists
+    if video_id not in mylist[username]:
+        mylist[username].append(video_id)
+        save_mylist(mylist)
+        return True
+    return False
+
+def remove_from_mylist(username, video_id):
+    """Remove video from user's My List"""
+    mylist = load_mylist()
+    if username in mylist and video_id in mylist[username]:
+        mylist[username] = [v for v in mylist[username] if v != video_id]
+        save_mylist(mylist)
+        return True
+    return False
+
+def is_in_mylist(username, video_id):
+    """Check if video is in user's My List"""
+    mylist = load_mylist()
+    return username in mylist and video_id in mylist[username]
+
+def get_user_mylist(username):
+    """Get user's My List with video details"""
+    mylist = load_mylist()
+    videos = load_videos()
+    result = []
+    if username in mylist:
+        for video_id in mylist[username]:
+            if video_id in videos:
+                result.append({**videos[video_id], 'id': video_id})
+    return result
+
+def get_user_watch_history(username):
+    """Get user's watch history with video details"""
+    history = load_watch_history()
+    videos = load_videos()
+    result = []
+    if username in history:
+        for entry in history[username]:
+            video_id = entry['video_id']
+            if video_id in videos:
+                result.append({
+                    **videos[video_id],
+                    'id': video_id,
+                    'watched_at': entry['watched_at']
+                })
+    return result
+
+def get_trending_videos():
+    """Get trending videos (most viewed in last 7 days)"""
+    videos = load_videos()
+    now = datetime.now()
+    trending = []
+    
+    for vid_id, vid in videos.items():
+        uploaded_at = datetime.fromisoformat(vid.get('uploaded_at', '2000-01-01'))
+        if (now - uploaded_at).days <= 7:
+            trending.append({
+                **vid,
+                'id': vid_id,
+                'trending_score': vid.get('views', 0) / max(1, (now - uploaded_at).days + 1)
+            })
+    
+    trending.sort(key=lambda x: x['trending_score'], reverse=True)
+    return trending[:10]
+
 # ===== ADMIN DECORATOR =====
 
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'username' not in session:
-            return jsonify({'error': 'Unauthorized'}), 401
+            flash('Please login as admin', 'error')
+            return redirect(url_for('admin_panel'))
         users = load_users()
         if session['username'] not in users or users[session['username']].get('role') != 'admin':
-            return jsonify({'error': 'Admin access required'}), 403
+            flash('Admin access required', 'error')
+            return redirect(url_for('index'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -183,7 +342,8 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'username' not in session:
-            return jsonify({'error': 'Please login first'}), 401
+            flash('Please login first', 'error')
+            return redirect(url_for('login_page'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -216,49 +376,49 @@ def upload_file_to_ftp(local_path, remote_path):
 # ===== MOCK DATA =====
 MOCK_MOVIES = {
     'action': [
-        {'title': 'The Dark Knight', 'year': 2008, 'size': '2.1 GB', 'format': 'MKV', 'rating': '9.0', 'poster': '🎬'},
-        {'title': 'Inception', 'year': 2010, 'size': '1.8 GB', 'format': 'MP4', 'rating': '8.8', 'poster': '🧠'},
-        {'title': 'Mad Max Fury Road', 'year': 2015, 'size': '2.4 GB', 'format': 'MKV', 'rating': '8.1', 'poster': '🔥'},
-        {'title': 'John Wick', 'year': 2014, 'size': '1.9 GB', 'format': 'MP4', 'rating': '7.4', 'poster': '🔫'},
-        {'title': 'Gladiator', 'year': 2000, 'size': '2.2 GB', 'format': 'MKV', 'rating': '8.5', 'poster': '⚔️'},
+        {'title': 'The Dark Knight', 'year': 2008, 'size': '2.1 GB', 'format': 'MKV', 'rating': 9.0, 'poster': '🎬'},
+        {'title': 'Inception', 'year': 2010, 'size': '1.8 GB', 'format': 'MP4', 'rating': 8.8, 'poster': '🧠'},
+        {'title': 'Mad Max Fury Road', 'year': 2015, 'size': '2.4 GB', 'format': 'MKV', 'rating': 8.1, 'poster': '🔥'},
+        {'title': 'John Wick', 'year': 2014, 'size': '1.9 GB', 'format': 'MP4', 'rating': 7.4, 'poster': '🔫'},
+        {'title': 'Gladiator', 'year': 2000, 'size': '2.2 GB', 'format': 'MKV', 'rating': 8.5, 'poster': '⚔️'},
     ],
     'comedy': [
-        {'title': 'Superbad', 'year': 2007, 'size': '1.5 GB', 'format': 'MP4', 'rating': '7.6', 'poster': '😄'},
-        {'title': 'The Hangover', 'year': 2009, 'size': '1.7 GB', 'format': 'MKV', 'rating': '7.7', 'poster': '🍺'},
-        {'title': 'Bridesmaids', 'year': 2011, 'size': '1.6 GB', 'format': 'MP4', 'rating': '6.8', 'poster': '💒'},
+        {'title': 'Superbad', 'year': 2007, 'size': '1.5 GB', 'format': 'MP4', 'rating': 7.6, 'poster': '😄'},
+        {'title': 'The Hangover', 'year': 2009, 'size': '1.7 GB', 'format': 'MKV', 'rating': 7.7, 'poster': '🍺'},
+        {'title': 'Bridesmaids', 'year': 2011, 'size': '1.6 GB', 'format': 'MP4', 'rating': 6.8, 'poster': '💒'},
     ],
     'drama': [
-        {'title': 'The Shawshank Redemption', 'year': 1994, 'size': '2.3 GB', 'format': 'MKV', 'rating': '9.3', 'poster': '🏛️'},
-        {'title': 'The Godfather', 'year': 1972, 'size': '2.1 GB', 'format': 'MP4', 'rating': '9.2', 'poster': '🍷'},
-        {'title': 'Forrest Gump', 'year': 1994, 'size': '2.0 GB', 'format': 'MKV', 'rating': '8.8', 'poster': '🏃'},
+        {'title': 'The Shawshank Redemption', 'year': 1994, 'size': '2.3 GB', 'format': 'MKV', 'rating': 9.3, 'poster': '🏛️'},
+        {'title': 'The Godfather', 'year': 1972, 'size': '2.1 GB', 'format': 'MP4', 'rating': 9.2, 'poster': '🍷'},
+        {'title': 'Forrest Gump', 'year': 1994, 'size': '2.0 GB', 'format': 'MKV', 'rating': 8.8, 'poster': '🏃'},
     ],
     'horror': [
-        {'title': 'The Conjuring', 'year': 2013, 'size': '1.8 GB', 'format': 'MKV', 'rating': '7.5', 'poster': '👻'},
-        {'title': 'Hereditary', 'year': 2018, 'size': '2.0 GB', 'format': 'MP4', 'rating': '7.3', 'poster': '😱'},
-        {'title': 'Get Out', 'year': 2017, 'size': '1.7 GB', 'format': 'MKV', 'rating': '7.8', 'poster': '🧠'},
+        {'title': 'The Conjuring', 'year': 2013, 'size': '1.8 GB', 'format': 'MKV', 'rating': 7.5, 'poster': '👻'},
+        {'title': 'Hereditary', 'year': 2018, 'size': '2.0 GB', 'format': 'MP4', 'rating': 7.3, 'poster': '😱'},
+        {'title': 'Get Out', 'year': 2017, 'size': '1.7 GB', 'format': 'MKV', 'rating': 7.8, 'poster': '🧠'},
     ],
     'sci-fi': [
-        {'title': 'Interstellar', 'year': 2014, 'size': '2.6 GB', 'format': 'MKV', 'rating': '8.6', 'poster': '🌌'},
-        {'title': 'The Matrix', 'year': 1999, 'size': '1.9 GB', 'format': 'MP4', 'rating': '8.7', 'poster': '💊'},
-        {'title': 'Dune', 'year': 2021, 'size': '3.2 GB', 'format': 'MKV', 'rating': '8.0', 'poster': '🏜️'},
+        {'title': 'Interstellar', 'year': 2014, 'size': '2.6 GB', 'format': 'MKV', 'rating': 8.6, 'poster': '🌌'},
+        {'title': 'The Matrix', 'year': 1999, 'size': '1.9 GB', 'format': 'MP4', 'rating': 8.7, 'poster': '💊'},
+        {'title': 'Dune', 'year': 2021, 'size': '3.2 GB', 'format': 'MKV', 'rating': 8.0, 'poster': '🏜️'},
     ],
     'romance': [
-        {'title': 'The Notebook', 'year': 2004, 'size': '1.6 GB', 'format': 'MP4', 'rating': '7.8', 'poster': '📖'},
-        {'title': 'Titanic', 'year': 1997, 'size': '2.4 GB', 'format': 'MKV', 'rating': '7.9', 'poster': '🚢'},
+        {'title': 'The Notebook', 'year': 2004, 'size': '1.6 GB', 'format': 'MP4', 'rating': 7.8, 'poster': '📖'},
+        {'title': 'Titanic', 'year': 1997, 'size': '2.4 GB', 'format': 'MKV', 'rating': 7.9, 'poster': '🚢'},
     ],
     'documentary': [
-        {'title': 'Planet Earth II', 'year': 2016, 'size': '4.5 GB', 'format': 'MKV', 'rating': '9.5', 'poster': '🌍'},
-        {'title': 'Our Planet', 'year': 2019, 'size': '3.8 GB', 'format': 'MP4', 'rating': '9.3', 'poster': '🌿'},
+        {'title': 'Planet Earth II', 'year': 2016, 'size': '4.5 GB', 'format': 'MKV', 'rating': 9.5, 'poster': '🌍'},
+        {'title': 'Our Planet', 'year': 2019, 'size': '3.8 GB', 'format': 'MP4', 'rating': 9.3, 'poster': '🌿'},
     ],
     'anime': [
-        {'title': 'Spirited Away', 'year': 2001, 'size': '1.7 GB', 'format': 'MKV', 'rating': '8.6', 'poster': '🏮'},
-        {'title': 'Your Name', 'year': 2016, 'size': '1.5 GB', 'format': 'MP4', 'rating': '8.4', 'poster': '✨'},
-        {'title': 'Demon Slayer', 'year': 2020, 'size': '2.0 GB', 'format': 'MKV', 'rating': '8.6', 'poster': '⚔️'},
+        {'title': 'Spirited Away', 'year': 2001, 'size': '1.7 GB', 'format': 'MKV', 'rating': 8.6, 'poster': '🏮'},
+        {'title': 'Your Name', 'year': 2016, 'size': '1.5 GB', 'format': 'MP4', 'rating': 8.4, 'poster': '✨'},
+        {'title': 'Demon Slayer', 'year': 2020, 'size': '2.0 GB', 'format': 'MKV', 'rating': 8.6, 'poster': '⚔️'},
     ],
     'adult': [
-        {'title': 'Adult Collection Vol 1', 'year': 2024, 'size': '3.2 GB', 'format': 'MKV', 'rating': '🔞', 'poster': '🔞'},
-        {'title': 'Adult Collection Vol 2', 'year': 2024, 'size': '3.5 GB', 'format': 'MP4', 'rating': '🔞', 'poster': '🔞'},
-        {'title': 'Adult Film 1', 'year': 2023, 'size': '2.8 GB', 'format': 'MKV', 'rating': '🔞', 'poster': '🔞'},
+        {'title': 'Adult Collection Vol 1', 'year': 2024, 'size': '3.2 GB', 'format': 'MKV', 'rating': 0, 'poster': '🔞'},
+        {'title': 'Adult Collection Vol 2', 'year': 2024, 'size': '3.5 GB', 'format': 'MP4', 'rating': 0, 'poster': '🔞'},
+        {'title': 'Adult Film 1', 'year': 2023, 'size': '2.8 GB', 'format': 'MKV', 'rating': 0, 'poster': '🔞'},
     ],
 }
 
@@ -316,7 +476,8 @@ def get_movie_listing(category):
                         'size': size_str,
                         'format': ext.upper().replace('.', ''),
                         'rating': '⭐',
-                        'poster': '🎬'
+                        'poster': '🎬',
+                        'thumbnail_color': generate_thumbnail(filename)
                     })
         movies.sort(key=lambda x: x['title'])
         return movies if movies else MOCK_MOVIES.get(category, [])
@@ -334,13 +495,16 @@ def index():
     featured = MOCK_MOVIES.get('action', [])[:5]
     users = load_users()
     leaderboard = get_leaderboard()
+    trending = get_trending_videos()
     return render_template('index.html', 
                          categories=MOVIE_CATEGORIES,
                          featured=featured,
+                         trending=trending,
                          logged_in='username' in session,
                          username=session.get('username', ''),
                          leaderboard=leaderboard,
-                         user_count=len([u for u in users.values() if u.get('role') != 'admin']))
+                         user_count=len([u for u in users.values() if u.get('role') != 'admin']),
+                         theme=session.get('theme', 'dark'))
 
 @app.route('/category/<category_id>')
 def category_movies(category_id):
@@ -353,7 +517,8 @@ def category_movies(category_id):
                          movies=movies,
                          categories=MOVIE_CATEGORIES,
                          logged_in='username' in session,
-                         username=session.get('username', ''))
+                         username=session.get('username', ''),
+                         theme=session.get('theme', 'dark'))
 
 @app.route('/stream/<category>/<filename>')
 def stream_movie(category, filename):
@@ -368,6 +533,9 @@ def stream_movie(category, filename):
         
         if video_id:
             increment_views(video_id)
+            # Add to watch history if user is logged in
+            if 'username' in session:
+                add_to_watch_history(session['username'], video_id)
         
         ftp = get_ftp_connection()
         remote_path = f'/movies/{category}/{filename}'
@@ -385,7 +553,6 @@ def stream_movie(category, filename):
 @app.route('/download/<category>/<filename>')
 def download_movie(category, filename):
     try:
-        # Check if this is a user-uploaded video
         videos = load_videos()
         video_id = None
         for vid_id, vid in videos.items():
@@ -395,6 +562,8 @@ def download_movie(category, filename):
         
         if video_id:
             increment_views(video_id)
+            if 'username' in session:
+                add_to_watch_history(session['username'], video_id)
         
         ftp = get_ftp_connection()
         remote_path = f'/movies/{category}/{filename}'
@@ -424,14 +593,15 @@ def search_movies():
                          results=results,
                          categories=MOVIE_CATEGORIES,
                          logged_in='username' in session,
-                         username=session.get('username', ''))
+                         username=session.get('username', ''),
+                         theme=session.get('theme', 'dark'))
 
 # ===== AUTH ROUTES =====
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
-        return render_template('register.html', logged_in='username' in session)
+        return render_template('register.html', logged_in='username' in session, theme=session.get('theme', 'dark'))
     
     data = request.form
     username = data.get('username', '').strip()
@@ -456,6 +626,7 @@ def register():
     # Save profile picture
     profile_pic_path = ""
     if profile_pic and profile_pic.filename:
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
         ext = os.path.splitext(profile_pic.filename)[1]
         filename = f"{username}_{secrets.token_hex(4)}{ext}"
         filepath = os.path.join(UPLOAD_FOLDER, filename)
@@ -467,7 +638,8 @@ def register():
         "role": "user",
         "created_at": datetime.now().isoformat(),
         "profile_pic": profile_pic_path,
-        "total_views": 0
+        "total_views": 0,
+        "total_uploads": 0
     }
     save_users(users)
     
@@ -477,7 +649,7 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
     if request.method == 'GET':
-        return render_template('login.html', logged_in='username' in session)
+        return render_template('login.html', logged_in='username' in session, theme=session.get('theme', 'dark'))
     
     data = request.form
     username = data.get('username', '').strip()
@@ -501,6 +673,13 @@ def logout():
     session.clear()
     flash('Logged out successfully', 'success')
     return redirect(url_for('index'))
+
+@app.route('/toggle-theme')
+def toggle_theme():
+    """Toggle dark/light theme"""
+    current = session.get('theme', 'dark')
+    session['theme'] = 'light' if current == 'dark' else 'dark'
+    return redirect(request.referrer or '/')
 
 # ===== API ROUTES =====
 
@@ -532,7 +711,8 @@ def check_auth():
 @app.route('/api/leaderboard', methods=['GET'])
 def api_leaderboard():
     """Get real-time leaderboard data"""
-    leaderboard = get_leaderboard()
+    time_filter = request.args.get('filter', 'all')
+    leaderboard = get_leaderboard(time_filter)
     return jsonify({'leaderboard': leaderboard})
 
 @app.route('/api/user-stats', methods=['GET'])
@@ -543,6 +723,8 @@ def api_user_stats():
     videos = get_user_videos(username)
     total_videos = len(videos)
     total_views = sum(v.get('views', 0) for v in videos.values())
+    total_rating = sum(v.get('rating', 0) for v in videos.values())
+    avg_rating = total_rating / total_videos if total_videos > 0 else 0
     
     video_list = []
     for vid_id, vid in videos.items():
@@ -554,7 +736,9 @@ def api_user_stats():
             'views': vid.get('views', 0),
             'uploaded_at': vid.get('uploaded_at', ''),
             'size': vid.get('size', ''),
-            'format': vid.get('format', '')
+            'format': vid.get('format', ''),
+            'rating': vid.get('rating', 0),
+            'is_in_mylist': is_in_mylist(username, vid_id)
         })
     
     video_list.sort(key=lambda x: x['views'], reverse=True)
@@ -562,17 +746,59 @@ def api_user_stats():
     return jsonify({
         'total_videos': total_videos,
         'total_views': total_views,
+        'avg_rating': round(avg_rating, 1),
         'videos': video_list,
         'profile_pic': load_users().get(username, {}).get('profile_pic', '')
     })
 
-@app.route('/api/video/<video_id>/views', methods=['POST'])
-def api_video_views(video_id):
-    """Get views for a specific video"""
+@app.route('/api/video/<video_id>/rate', methods=['POST'])
+@login_required
+def api_rate_video(video_id):
+    """Rate a video (1-5 stars)"""
+    data = request.json
+    rating = data.get('rating', 0)
+    if rating < 1 or rating > 5:
+        return jsonify({'error': 'Rating must be between 1 and 5'}), 400
+    
     videos = load_videos()
-    if video_id in videos:
-        return jsonify({'views': videos[video_id].get('views', 0)})
-    return jsonify({'error': 'Video not found'}), 404
+    if video_id not in videos:
+        return jsonify({'error': 'Video not found'}), 404
+    
+    videos[video_id]['rating'] = rating
+    save_videos(videos)
+    return jsonify({'success': True, 'rating': rating})
+
+@app.route('/api/mylist', methods=['GET', 'POST', 'DELETE'])
+@login_required
+def api_mylist():
+    """Manage My List"""
+    username = session.get('username')
+    
+    if request.method == 'GET':
+        mylist = get_user_mylist(username)
+        return jsonify({'mylist': mylist})
+    
+    data = request.json
+    video_id = data.get('video_id')
+    
+    if not video_id:
+        return jsonify({'error': 'Video ID required'}), 400
+    
+    if request.method == 'POST':
+        result = add_to_mylist(username, video_id)
+        return jsonify({'success': result})
+    
+    if request.method == 'DELETE':
+        result = remove_from_mylist(username, video_id)
+        return jsonify({'success': result})
+
+@app.route('/api/watch-history', methods=['GET'])
+@login_required
+def api_watch_history():
+    """Get user's watch history"""
+    username = session.get('username')
+    history = get_user_watch_history(username)
+    return jsonify({'history': history})
 
 @app.route('/api/upload', methods=['POST'])
 @login_required
@@ -633,11 +859,13 @@ def api_upload():
         'uploaded_at': datetime.now().isoformat(),
         'views': 0,
         'size': size_str,
-        'format': os.path.splitext(file.filename)[1].upper().replace('.', '')
+        'format': os.path.splitext(file.filename)[1].upper().replace('.', ''),
+        'rating': 0,
+        'thumbnail_color': generate_thumbnail(file.filename)
     }
     save_videos(videos)
     
-    # Update user's video count (implicitly through total views)
+    # Update user's video count
     update_user_total_views(username)
     
     return jsonify({'success': True, 'message': f'Movie "{file.filename}" uploaded successfully!', 'video_id': video_id})
@@ -649,13 +877,13 @@ def api_admin_stats():
     stats = get_video_stats()
     users = load_users()
     
-    # User list (without passwords)
     user_list = [
         {
             'username': u,
             'role': data.get('role', 'user'),
             'created_at': data.get('created_at', ''),
             'total_views': data.get('total_views', 0),
+            'total_uploads': data.get('total_uploads', 0),
             'profile_pic': data.get('profile_pic', '')
         }
         for u, data in users.items()
@@ -674,7 +902,6 @@ def api_admin_delete_video(video_id):
     if video_id not in videos:
         return jsonify({'error': 'Video not found'}), 404
     
-    # Delete from FTP
     video = videos[video_id]
     try:
         ftp = get_ftp_connection()
@@ -682,14 +909,12 @@ def api_admin_delete_video(video_id):
         ftp.delete(remote_path)
         ftp.quit()
     except:
-        pass  # Continue even if FTP delete fails
+        pass
     
-    # Remove from database
     uploaded_by = video.get('uploaded_by')
     del videos[video_id]
     save_videos(videos)
     
-    # Update user's total views
     if uploaded_by:
         update_user_total_views(uploaded_by)
     
@@ -706,14 +931,12 @@ def api_admin_delete_user(username):
     if username not in users:
         return jsonify({'error': 'User not found'}), 404
     
-    # Delete user's videos
     videos = load_videos()
     videos_to_delete = [vid_id for vid_id, vid in videos.items() if vid.get('uploaded_by') == username]
     for vid_id in videos_to_delete:
         del videos[vid_id]
     save_videos(videos)
     
-    # Delete user
     del users[username]
     save_users(users)
     
@@ -731,26 +954,27 @@ def api_upload_profile_pic():
     if file.filename == '':
         return jsonify({'error': 'No file selected'}), 400
     
-    # Validate file type
     allowed_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}
     ext = os.path.splitext(file.filename)[1].lower()
     if ext not in allowed_extensions:
         return jsonify({'error': 'Invalid file type. Use JPG, PNG, GIF, or WEBP'}), 400
     
-    # Save file
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    
     filename = f"{username}_{secrets.token_hex(4)}{ext}"
     filepath = os.path.join(UPLOAD_FOLDER, filename)
     file.save(filepath)
     
-    # Update user
     users = load_users()
     if username in users:
-        # Delete old profile pic if exists
         old_pic = users[username].get('profile_pic', '')
         if old_pic and old_pic.startswith(f'/{UPLOAD_FOLDER}/'):
             old_path = os.path.join('.', old_pic[1:])
             if os.path.exists(old_path):
-                os.remove(old_path)
+                try:
+                    os.remove(old_path)
+                except:
+                    pass
         
         users[username]['profile_pic'] = f"/{UPLOAD_FOLDER}/{filename}"
         save_users(users)
@@ -764,7 +988,7 @@ def api_upload_profile_pic():
 def admin_panel():
     """Admin panel - only accessible via /admin URL"""
     if 'username' not in session:
-        return render_template('admin_login.html')
+        return render_template('admin_login.html', theme=session.get('theme', 'dark'))
     
     users = load_users()
     if session.get('username') not in users or users[session.get('username')].get('role') != 'admin':
@@ -776,7 +1000,8 @@ def admin_panel():
                          stats=stats,
                          users=users,
                          categories=MOVIE_CATEGORIES,
-                         username=session.get('username', ''))
+                         username=session.get('username', ''),
+                         theme=session.get('theme', 'dark'))
 
 @app.route('/admin/login', methods=['POST'])
 def admin_login():
@@ -800,10 +1025,70 @@ def admin_login():
 
 @app.route('/admin/logout')
 def admin_logout():
+    """Admin logout"""
     session.clear()
+    flash('Logged out successfully', 'success')
     return redirect(url_for('admin_panel'))
 
-# ===== DASHBOARD ROUTES =====
+@app.route('/admin/upload', methods=['POST'])
+@admin_required
+def admin_upload():
+    """Admin upload route (for admin.html form)"""
+    if 'movie_file' not in request.files:
+        flash('No file selected', 'error')
+        return redirect(url_for('admin_panel'))
+    
+    file = request.files['movie_file']
+    category = request.form.get('category', '')
+    title = request.form.get('title', '')
+    
+    if file.filename == '':
+        flash('No file selected', 'error')
+        return redirect(url_for('admin_panel'))
+    if not category:
+        flash('Please select a category', 'error')
+        return redirect(url_for('admin_panel'))
+    
+    temp_path = os.path.join(tempfile.gettempdir(), file.filename)
+    file.save(temp_path)
+    remote_path = f'/movies/{category}/{file.filename}'
+    success = upload_file_to_ftp(temp_path, remote_path)
+    os.remove(temp_path)
+    
+    if success:
+        videos = load_videos()
+        video_id = generate_video_id()
+        
+        file_size_bytes = os.path.getsize(temp_path)
+        if file_size_bytes < 1024*1024:
+            size_str = f"{file_size_bytes/1024:.1f} KB"
+        elif file_size_bytes < 1024*1024*1024:
+            size_str = f"{file_size_bytes/(1024*1024):.1f} MB"
+        else:
+            size_str = f"{file_size_bytes/(1024*1024*1024):.2f} GB"
+        
+        videos[video_id] = {
+            'title': title if title else os.path.splitext(file.filename)[0],
+            'filename': file.filename,
+            'category': category,
+            'uploaded_by': session.get('username', 'admin'),
+            'uploaded_at': datetime.now().isoformat(),
+            'views': 0,
+            'size': size_str,
+            'format': os.path.splitext(file.filename)[1].upper().replace('.', ''),
+            'rating': 0,
+            'thumbnail_color': generate_thumbnail(file.filename)
+        }
+        save_videos(videos)
+        update_user_total_views(session.get('username', 'admin'))
+        
+        flash(f'Movie "{file.filename}" uploaded successfully!', 'success')
+    else:
+        flash('Upload failed. Check FTP server connection.', 'error')
+    
+    return redirect(url_for('admin_panel'))
+
+# ===== USER ROUTES =====
 
 @app.route('/dashboard')
 @login_required
@@ -816,7 +1101,83 @@ def dashboard():
                          username=username,
                          profile_pic=user_data.get('profile_pic', ''),
                          categories=MOVIE_CATEGORIES,
-                         logged_in=True)
+                         logged_in=True,
+                         theme=session.get('theme', 'dark'))
+
+@app.route('/profile/<username>')
+def profile_page(username):
+    """User profile page - view user's uploaded videos"""
+    users = load_users()
+    if username not in users:
+        flash('User not found', 'error')
+        return redirect(url_for('index'))
+    
+    user_data = users[username]
+    videos = get_user_videos(username)
+    video_list = []
+    for vid_id, vid in videos.items():
+        video_list.append({**vid, 'id': vid_id})
+    video_list.sort(key=lambda x: x.get('views', 0), reverse=True)
+    
+    return render_template('profile.html',
+                         profile_user=username,
+                         user_data=user_data,
+                         videos=video_list,
+                         categories=MOVIE_CATEGORIES,
+                         logged_in='username' in session,
+                         current_user=session.get('username', ''),
+                         theme=session.get('theme', 'dark'))
+
+@app.route('/mylist')
+@login_required
+def mylist():
+    """My List (watch later) page"""
+    username = session.get('username')
+    mylist = get_user_mylist(username)
+    return render_template('mylist.html',
+                         mylist=mylist,
+                         categories=MOVIE_CATEGORIES,
+                         logged_in=True,
+                         username=username,
+                         theme=session.get('theme', 'dark'))
+
+@app.route('/watch-history')
+@login_required
+def watch_history():
+    """Watch history page"""
+    username = session.get('username')
+    history = get_user_watch_history(username)
+    return render_template('watch_history.html',
+                         history=history,
+                         categories=MOVIE_CATEGORIES,
+                         logged_in=True,
+                         username=username,
+                         theme=session.get('theme', 'dark'))
+
+@app.route('/leaderboard')
+def leaderboard_page():
+    """Full leaderboard page"""
+    return render_template('leaderboard.html', 
+                         categories=MOVIE_CATEGORIES,
+                         logged_in='username' in session,
+                         username=session.get('username', ''),
+                         theme=session.get('theme', 'dark'))
+
+@app.route('/api/mylist/add/<video_id>', methods=['POST'])
+@login_required
+def api_mylist_add(video_id):
+    """Add video to My List"""
+    username = session.get('username')
+    result = add_to_mylist(username, video_id)
+    return jsonify({'success': result})
+
+@app.route('/api/mylist/remove/<video_id>', methods=['DELETE'])
+@login_required
+def api_mylist_remove(video_id):
+    """Remove video from My List"""
+    username = session.get('username')
+    result = remove_from_mylist(username, video_id)
+    return jsonify({'success': result})
 
 # ===== OTHER ROUTES =====
 
