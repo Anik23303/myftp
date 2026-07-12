@@ -5,9 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Dashboard - Movie FTP</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; }
+        /* ===== THEME VARIABLES ===== */
+        :root {
+            --bg-primary: #141414;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #1a1a2e;
+            --bg-hover: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #e5e5e5;
+            --text-muted: #888888;
+            --border-color: #333333;
+            --accent: #e50914;
+            --accent-hover: #ff0a1a;
+            --shadow: rgba(0,0,0,0.8);
+            --success: #00ff00;
+            --gold: #ffd700;
+        }
         
+        [data-theme="light"] {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-hover: #e8e8e8;
+            --text-primary: #141414;
+            --text-secondary: #333333;
+            --text-muted: #666666;
+            --border-color: #dddddd;
+            --shadow: rgba(0,0,0,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+
+        /* ===== NAVBAR ===== */
         .navbar {
             position: fixed;
             top: 0;
@@ -18,13 +59,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #141414;
-            border-bottom: 1px solid #333;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
             flex-wrap: wrap;
             gap: 10px;
         }
         .navbar .brand a {
-            color: #e50914;
+            color: var(--accent);
             text-decoration: none;
             font-size: 1.5rem;
             font-weight: bold;
@@ -35,93 +76,135 @@
             gap: 20px;
         }
         .navbar .nav-right a {
-            color: #e5e5e5;
+            color: var(--text-secondary);
             text-decoration: none;
             transition: color 0.3s;
         }
-        .navbar .nav-right a:hover { color: #fff; }
+        .navbar .nav-right a:hover { color: var(--text-primary); }
+        .navbar .nav-right .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .navbar .nav-right .theme-toggle:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
         
+        /* ===== CONTAINER ===== */
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 80px 30px 30px;
         }
         
-        .dashboard-header {
+        /* ===== PROFILE HEADER ===== */
+        .profile-header {
             display: flex;
             align-items: center;
             gap: 25px;
             margin-bottom: 30px;
             flex-wrap: wrap;
+            background: var(--bg-secondary);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
         }
-        .dashboard-header .avatar {
+        .profile-header .avatar {
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: #e50914;
+            background: var(--accent);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2.5rem;
             font-weight: bold;
             color: white;
+            overflow: hidden;
+            flex-shrink: 0;
         }
-        .dashboard-header .avatar img {
+        .profile-header .avatar img {
             width: 100%;
             height: 100%;
-            border-radius: 50%;
             object-fit: cover;
         }
-        .dashboard-header .user-details h1 {
+        .profile-header .user-details {
+            flex: 1;
+        }
+        .profile-header .user-details h1 {
             font-size: 1.8rem;
         }
-        .dashboard-header .user-details p {
-            color: #888;
+        .profile-header .user-details p {
+            color: var(--text-muted);
         }
-        .dashboard-header .upload-pic-btn {
-            background: #2a2a3e;
-            color: #e5e5e5;
-            border: 1px solid #333;
+        .profile-header .user-details .stats-row {
+            display: flex;
+            gap: 20px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        .profile-header .user-details .stats-row span {
+            background: var(--bg-hover);
+            padding: 4px 14px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+        }
+        .profile-header .upload-pic-btn {
+            background: var(--bg-hover);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
             padding: 8px 16px;
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.3s;
             font-size: 0.85rem;
         }
-        .dashboard-header .upload-pic-btn:hover {
-            border-color: #e50914;
-            color: #fff;
+        .profile-header .upload-pic-btn:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
         }
         
+        /* ===== STATS CARDS ===== */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
         .stat-card {
-            background: #1a1a2e;
+            background: var(--bg-secondary);
             padding: 20px;
             border-radius: 10px;
-            border: 1px solid #333;
+            border: 1px solid var(--border-color);
             text-align: center;
+            transition: transform 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
         }
         .stat-card .number {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: bold;
-            color: #e50914;
+            color: var(--accent);
         }
         .stat-card .label {
-            color: #888;
-            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
             margin-top: 5px;
         }
         
+        /* ===== FILTER SECTION ===== */
         .filter-section {
-            background: #1a1a2e;
+            background: var(--bg-secondary);
             padding: 15px 20px;
             border-radius: 10px;
-            border: 1px solid #333;
+            border: 1px solid var(--border-color);
             margin-bottom: 20px;
             display: flex;
             gap: 15px;
@@ -129,53 +212,92 @@
             align-items: center;
         }
         .filter-section label {
-            color: #888;
+            color: var(--text-muted);
             font-size: 0.9rem;
         }
         .filter-section input, .filter-section select {
             padding: 8px 12px;
-            border: none;
+            border: 1px solid var(--border-color);
             border-radius: 6px;
-            background: #2a2a3e;
-            color: white;
+            background: var(--bg-hover);
+            color: var(--text-primary);
             font-size: 0.9rem;
         }
         .filter-section input:focus, .filter-section select:focus {
-            outline: 2px solid #e50914;
+            outline: 2px solid var(--accent);
         }
-        .filter-section button {
+        .filter-section .btn-apply {
             padding: 8px 20px;
             border: none;
             border-radius: 6px;
-            background: #e50914;
+            background: var(--accent);
             color: white;
             cursor: pointer;
             font-weight: bold;
+            transition: background 0.3s;
         }
-        .filter-section button:hover { background: #ff0a1a; }
+        .filter-section .btn-apply:hover {
+            background: var(--accent-hover);
+        }
+        .filter-section .btn-clear {
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-section .btn-clear:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
         
+        /* ===== VIDEOS GRID ===== */
         .videos-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 20px;
         }
         .video-card {
-            background: #1a1a2e;
+            background: var(--bg-secondary);
             border-radius: 10px;
             overflow: hidden;
-            border: 1px solid #333;
-            transition: transform 0.3s;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s, box-shadow 0.3s;
         }
         .video-card:hover {
             transform: scale(1.02);
+            box-shadow: 0 10px 30px var(--shadow);
         }
         .video-card .poster {
             height: 150px;
-            background: #2a2a3e;
+            background: var(--bg-hover);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 3rem;
+            position: relative;
+        }
+        .video-card .poster .views-badge {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+        }
+        .video-card .poster .mylist-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--gold);
+            color: #141414;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
         }
         .video-card .info {
             padding: 12px 15px;
@@ -185,7 +307,7 @@
             font-size: 1rem;
         }
         .video-card .info .meta {
-            color: #888;
+            color: var(--text-muted);
             font-size: 0.8rem;
             margin-top: 5px;
             display: flex;
@@ -193,14 +315,20 @@
             flex-wrap: wrap;
         }
         .video-card .info .meta span {
-            background: #2a2a3e;
+            background: var(--bg-hover);
             padding: 2px 10px;
             border-radius: 4px;
+        }
+        .video-card .info .rating-stars {
+            color: var(--gold);
+            font-size: 0.9rem;
+            margin-top: 5px;
         }
         .video-card .actions {
             padding: 10px 15px 15px;
             display: flex;
             gap: 8px;
+            flex-wrap: wrap;
         }
         .video-card .actions a {
             flex: 1;
@@ -210,89 +338,109 @@
             text-decoration: none;
             font-size: 0.8rem;
             font-weight: bold;
+            min-width: 60px;
+            transition: all 0.3s;
         }
-        .btn-stream { background: #e50914; color: white; }
-        .btn-stream:hover { background: #ff0a1a; }
-        .btn-download { background: #2a2a3e; color: #ddd; }
-        .btn-download:hover { background: #3a3a5e; }
+        .btn-stream { background: var(--accent); color: white; }
+        .btn-stream:hover { background: var(--accent-hover); }
+        .btn-download { background: var(--bg-hover); color: var(--text-secondary); }
+        .btn-download:hover { background: var(--bg-hover); opacity: 0.8; }
+        .btn-mylist { 
+            background: transparent; 
+            color: var(--gold); 
+            border: 1px solid var(--gold);
+        }
+        .btn-mylist:hover { background: var(--gold); color: #141414; }
+        .btn-mylist.in-list { background: var(--gold); color: #141414; }
         
+        /* ===== EMPTY STATE ===== */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
-            color: #666;
+            color: var(--text-muted);
         }
         .empty-state .icon { font-size: 4rem; display: block; margin-bottom: 20px; }
+        .empty-state h2 { color: var(--text-secondary); margin-bottom: 10px; }
+        .empty-state .btn-upload {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 30px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .empty-state .btn-upload:hover { background: var(--accent-hover); }
         
-        .leaderboard-preview {
-            background: #1a1a2e;
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid #333;
-            margin-bottom: 20px;
-        }
-        .leaderboard-preview h3 {
-            color: #ffd700;
-            margin-bottom: 15px;
-        }
-        .lb-item {
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
             display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 8px 0;
-            border-bottom: 1px solid #333;
+            flex-direction: column;
+            gap: 10px;
         }
-        .lb-item .rank {
-            color: #888;
-            width: 30px;
-            font-weight: bold;
+        .toast {
+            padding: 12px 20px;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            box-shadow: 0 10px 30px var(--shadow);
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid var(--success);
+            max-width: 350px;
         }
-        .lb-item .lb-avatar {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: #2a2a3e;
-            text-align: center;
-            line-height: 30px;
-            font-weight: bold;
-            color: #fff;
-        }
-        .lb-item .lb-avatar img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        .lb-item .lb-name {
-            flex: 1;
-        }
-        .lb-item .lb-views {
-            color: #888;
-            font-size: 0.9rem;
+        .toast.error { border-left-color: var(--accent); }
+        .toast.info { border-left-color: var(--gold); }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
         
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .container { padding: 70px 15px 20px; }
-            .dashboard-header { gap: 15px; }
-            .dashboard-header .avatar { width: 60px; height: 60px; font-size: 2rem; }
+            .profile-header { flex-direction: column; text-align: center; padding: 20px; }
+            .profile-header .user-details .stats-row { justify-content: center; }
+            .filter-section { flex-direction: column; align-items: stretch; }
+            .filter-section input, .filter-section select { width: 100%; }
             .videos-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .profile-header .avatar { width: 60px; height: 60px; font-size: 2rem; }
         }
     </style>
 </head>
-<body>
+<body data-theme="{{ theme }}">
+
+    <!-- ===== NAVBAR ===== -->
     <nav class="navbar">
         <div class="brand"><a href="/">🎬 Movie FTP</a></div>
         <div class="nav-right">
+            <button class="theme-toggle" onclick="toggleTheme()">
+                {% if theme == 'dark' %}☀️ Light{% else %}🌙 Dark{% endif %}
+            </button>
             <a href="/">Home</a>
-            <a href="/logout">Logout</a>
+            <a href="/logout">🚪 Logout</a>
         </div>
     </nav>
 
+    <!-- ===== CONTAINER ===== -->
     <div class="container">
-        <!-- Dashboard Header -->
-        <div class="dashboard-header">
+        
+        <!-- ===== PROFILE HEADER ===== -->
+        <div class="profile-header">
             <div class="avatar">
                 {% if profile_pic %}
-                    <img src="{{ profile_pic }}" alt="Profile">
+                    <img src="{{ profile_pic }}" alt="{{ username }}">
                 {% else %}
                     {{ username[0].upper() }}
                 {% endif %}
@@ -300,32 +448,45 @@
             <div class="user-details">
                 <h1>👤 {{ username }}</h1>
                 <p>Your personal dashboard</p>
+                <div class="stats-row">
+                    <span>📹 <span id="totalVideos">0</span> videos</span>
+                    <span>👁️ <span id="totalViews">0</span> total views</span>
+                    <span>⭐ <span id="avgRating">0.0</span> avg rating</span>
+                </div>
             </div>
-            <form method="POST" action="/api/profile-pic" enctype="multipart/form-data" style="display:inline;">
-                <input type="file" name="profile_pic" id="profilePicInput" accept=".jpg,.jpeg,.png,.gif,.webp" style="display:none;" onchange="uploadProfilePic(this)">
-                <button type="button" class="upload-pic-btn" onclick="document.getElementById('profilePicInput').click()">📷 Change Photo</button>
-            </form>
+            <div>
+                <form method="POST" action="/api/profile-pic" enctype="multipart/form-data" style="display:inline;">
+                    <input type="file" name="profile_pic" id="profilePicInput" accept=".jpg,.jpeg,.png,.gif,.webp" style="display:none;" onchange="uploadProfilePic(this)">
+                    <button type="button" class="upload-pic-btn" onclick="document.getElementById('profilePicInput').click()">📷 Change Photo</button>
+                </form>
+                <br>
+                <a href="/mylist" style="color: var(--accent); text-decoration: none; font-size: 0.85rem; display: inline-block; margin-top: 5px;">📋 My List</a>
+                <span style="color: var(--text-muted); margin: 0 5px;">|</span>
+                <a href="/watch-history" style="color: var(--accent); text-decoration: none; font-size: 0.85rem; display: inline-block; margin-top: 5px;">📜 Watch History</a>
+            </div>
         </div>
 
-        <!-- Stats -->
+        <!-- ===== STATS ===== -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="number" id="totalVideos">0</div>
-                <div class="label">Total Videos Uploaded</div>
+                <div class="number" id="statTotalVideos">0</div>
+                <div class="label">Total Videos</div>
             </div>
             <div class="stat-card">
-                <div class="number" id="totalViews">0</div>
+                <div class="number" id="statTotalViews">0</div>
                 <div class="label">Total Views</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="statAvgRating">0.0</div>
+                <div class="label">Average Rating</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="statInMylist">0</div>
+                <div class="label">In My List</div>
             </div>
         </div>
 
-        <!-- Leaderboard Preview -->
-        <div class="leaderboard-preview" id="leaderboardPreview">
-            <h3>🏆 Top Creators</h3>
-            <div id="leaderboardList">Loading...</div>
-        </div>
-
-        <!-- Filter -->
+        <!-- ===== FILTER SECTION ===== -->
         <div class="filter-section">
             <label>🔍 Filter:</label>
             <input type="text" id="filterSearch" placeholder="Search by title..." onkeyup="applyFilters()">
@@ -342,22 +503,48 @@
                 <option value="date_asc">Oldest First</option>
                 <option value="title_asc">A-Z</option>
                 <option value="title_desc">Z-A</option>
+                <option value="rating_desc">Highest Rated</option>
             </select>
-            <button onclick="applyFilters()">Apply</button>
+            <button class="btn-apply" onclick="applyFilters()">Apply</button>
+            <button class="btn-clear" onclick="clearFilters()">Clear</button>
         </div>
 
-        <!-- Videos -->
+        <!-- ===== VIDEOS ===== -->
         <div id="videosContainer">
             <div class="empty-state">
-                <span class="icon">🎬</span>
+                <span class="icon">⏳</span>
                 <h2>Loading your videos...</h2>
             </div>
         </div>
     </div>
 
+    <!-- ===== TOAST CONTAINER ===== -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <script>
         let userVideos = [];
-        let leaderboardData = [];
+        let mylistData = [];
+
+        // ===== THEME TOGGLE =====
+        function toggleTheme() {
+            fetch('/toggle-theme')
+                .then(() => location.reload());
+        }
+
+        // ===== TOAST =====
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
 
         // ===== FETCH USER DATA =====
         function fetchUserData() {
@@ -366,7 +553,18 @@
                 .then(data => {
                     document.getElementById('totalVideos').textContent = data.total_videos;
                     document.getElementById('totalViews').textContent = data.total_views;
+                    document.getElementById('avgRating').textContent = data.avg_rating || '0.0';
+                    document.getElementById('statTotalVideos').textContent = data.total_videos;
+                    document.getElementById('statTotalViews').textContent = data.total_views;
+                    document.getElementById('statAvgRating').textContent = data.avg_rating || '0.0';
+                    
                     userVideos = data.videos || [];
+                    
+                    // Count how many are in My List
+                    let inList = 0;
+                    userVideos.forEach(v => { if (v.is_in_mylist) inList++; });
+                    document.getElementById('statInMylist').textContent = inList;
+                    
                     applyFilters();
                 })
                 .catch(() => {
@@ -380,36 +578,6 @@
                 });
         }
 
-        // ===== FETCH LEADERBOARD =====
-        function fetchLeaderboard() {
-            fetch('/api/leaderboard')
-                .then(r => r.json())
-                .then(data => {
-                    leaderboardData = data.leaderboard || [];
-                    renderLeaderboard();
-                });
-        }
-
-        function renderLeaderboard() {
-            const container = document.getElementById('leaderboardList');
-            if (leaderboardData.length === 0) {
-                container.innerHTML = '<p style="color:#888;">No users yet</p>';
-                return;
-            }
-            let html = '';
-            leaderboardData.forEach((user, index) => {
-                html += `
-                    <div class="lb-item">
-                        <span class="rank">#${index + 1}</span>
-                        <span class="lb-avatar">${user.username[0].toUpperCase()}</span>
-                        <span class="lb-name">${user.username}</span>
-                        <span class="lb-views">${user.total_views} views</span>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
         // ===== APPLY FILTERS =====
         function applyFilters() {
             const search = document.getElementById('filterSearch').value.toLowerCase();
@@ -418,17 +586,13 @@
 
             let filtered = [...userVideos];
 
-            // Search filter
             if (search) {
                 filtered = filtered.filter(v => v.title.toLowerCase().includes(search));
             }
-
-            // Category filter
             if (category) {
                 filtered = filtered.filter(v => v.category === category);
             }
 
-            // Sort
             switch(sort) {
                 case 'views_desc': filtered.sort((a, b) => b.views - a.views); break;
                 case 'views_asc': filtered.sort((a, b) => a.views - b.views); break;
@@ -436,12 +600,14 @@
                 case 'date_asc': filtered.sort((a, b) => new Date(a.uploaded_at) - new Date(b.uploaded_at)); break;
                 case 'title_asc': filtered.sort((a, b) => a.title.localeCompare(b.title)); break;
                 case 'title_desc': filtered.sort((a, b) => b.title.localeCompare(a.title)); break;
+                case 'rating_desc': filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0)); break;
                 default: break;
             }
 
             renderVideos(filtered);
         }
 
+        // ===== RENDER VIDEOS =====
         function renderVideos(videos) {
             const container = document.getElementById('videosContainer');
             if (videos.length === 0) {
@@ -450,6 +616,7 @@
                         <span class="icon">🎬</span>
                         <h2>No videos found</h2>
                         <p>Upload your first movie from the sidebar!</p>
+                        <a href="/" class="btn-upload">📤 Go to Homepage</a>
                     </div>
                 `;
                 return;
@@ -457,26 +624,65 @@
 
             let html = '<div class="videos-grid">';
             videos.forEach(video => {
+                const stars = video.rating ? '⭐'.repeat(Math.round(video.rating)) : '';
+                const inList = video.is_in_mylist ? 'in-list' : '';
+                const btnText = video.is_in_mylist ? '📋 In List' : '📋 Add';
+                
                 html += `
                     <div class="video-card">
-                        <div class="poster">🎬</div>
+                        <div class="poster" style="background: ${video.thumbnail_color || '#2a2a3e'};">
+                            🎬
+                            <span class="views-badge">👁️ ${video.views} views</span>
+                            ${video.is_in_mylist ? '<span class="mylist-badge">📋 My List</span>' : ''}
+                        </div>
                         <div class="info">
                             <div class="title">${video.title}</div>
                             <div class="meta">
                                 <span>📁 ${video.category}</span>
-                                <span>👁️ ${video.views} views</span>
                                 <span>📅 ${video.uploaded_at ? video.uploaded_at.slice(0,10) : 'N/A'}</span>
                             </div>
+                            ${stars ? `<div class="rating-stars">${stars}</div>` : ''}
                         </div>
                         <div class="actions">
                             <a href="/stream/${video.category}/${video.filename}" class="btn-stream">▶ Stream</a>
                             <a href="/download/${video.category}/${video.filename}" class="btn-download">⬇ Download</a>
+                            <button class="btn-mylist ${inList}" onclick="toggleMyList('${video.id}', this)">${btnText}</button>
                         </div>
                     </div>
                 `;
             });
             html += '</div>';
             container.innerHTML = html;
+        }
+
+        // ===== TOGGLE MY LIST =====
+        function toggleMyList(videoId, button) {
+            const isInList = button.classList.contains('in-list');
+            const url = isInList ? `/api/mylist/remove/${videoId}` : `/api/mylist/add/${videoId}`;
+            const method = isInList ? 'DELETE' : 'POST';
+
+            fetch(url, { method: method })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success !== false) {
+                        if (isInList) {
+                            button.classList.remove('in-list');
+                            button.textContent = '📋 Add';
+                            showToast('Removed from My List', 'info');
+                        } else {
+                            button.classList.add('in-list');
+                            button.textContent = '📋 In List';
+                            showToast('✅ Added to My List!', 'success');
+                        }
+                        // Update stat
+                        let count = parseInt(document.getElementById('statInMylist').textContent);
+                        document.getElementById('statInMylist').textContent = isInList ? count - 1 : count + 1;
+                        // Update video data
+                        const video = userVideos.find(v => v.id === videoId);
+                        if (video) video.is_in_mylist = !isInList;
+                    }
+                })
+                .catch(() => showToast('Error updating My List', 'error'));
         }
 
         // ===== UPLOAD PROFILE PICTURE =====
@@ -494,20 +700,36 @@
             .then(r => r.json())
             .then(data => {
                 if (data.success) {
-                    location.reload();
+                    showToast('✅ Profile picture updated!', 'success');
+                    setTimeout(() => location.reload(), 500);
                 } else {
-                    alert(data.error || 'Upload failed');
+                    showToast('❌ ' + (data.error || 'Upload failed'), 'error');
                 }
             })
-            .catch(() => alert('Upload failed'));
+            .catch(() => showToast('❌ Upload failed', 'error'));
         }
 
-        // ===== LIVE LEADERBOARD UPDATE =====
-        setInterval(fetchLeaderboard, 5000); // Update every 5 seconds
+        // ===== CLEAR FILTERS =====
+        function clearFilters() {
+            document.getElementById('filterSearch').value = '';
+            document.getElementById('filterCategory').value = '';
+            document.getElementById('filterSort').value = 'views_desc';
+            applyFilters();
+        }
+
+        // ===== KEYBOARD SHORTCUTS =====
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                document.getElementById('filterSearch').focus();
+            }
+            if (e.key === 'Escape') {
+                clearFilters();
+            }
+        });
 
         // ===== INIT =====
         fetchUserData();
-        fetchLeaderboard();
     </script>
 </body>
 </html>
