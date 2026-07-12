@@ -42,12 +42,12 @@
         .navbar .brand {
             display: flex;
             align-items: center;
-            gap: 30px;
+            gap: 20px;
         }
         .navbar .brand a {
             color: #e50914;
             text-decoration: none;
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: bold;
             letter-spacing: -1px;
         }
@@ -68,38 +68,36 @@
         .navbar .nav-right {
             display: flex;
             align-items: center;
-            gap: 20px;
-        }
-        .navbar .nav-right .upload-btn {
-            background: #e50914;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-            font-size: 0.9rem;
-        }
-        .navbar .nav-right .upload-btn:hover {
-            background: #ff0a1a;
+            gap: 15px;
         }
         .navbar .nav-right .user-badge {
             color: #00ff00;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
+        }
+        .navbar .nav-right .user-badge .avatar {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e50914;
+            color: white;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 8px;
+            vertical-align: middle;
         }
 
-        /* ===== SIDEBAR TOGGLE ===== */
+        /* ===== SIDEBAR TOGGLE (Top Left) ===== */
         .sidebar-toggle {
             position: fixed;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 999;
+            top: 15px;
+            left: 15px;
+            z-index: 1002;
             background: rgba(20,20,20,0.8);
             border: 1px solid #333;
             border-radius: 8px;
-            padding: 10px;
+            padding: 8px 10px;
             cursor: pointer;
             transition: all 0.3s;
         }
@@ -109,9 +107,9 @@
         }
         .sidebar-toggle .bar {
             display: block;
-            width: 25px;
-            height: 3px;
-            margin: 5px 0;
+            width: 22px;
+            height: 2px;
+            margin: 4px 0;
             background: #fff;
             transition: 0.3s;
         }
@@ -124,9 +122,9 @@
             bottom: 0;
             width: 280px;
             z-index: 1001;
-            background: #141414;
+            background: #0a0a0a;
             border-right: 1px solid #333;
-            padding: 80px 20px 20px;
+            padding: 70px 20px 20px;
             transition: left 0.3s ease;
             overflow-y: auto;
         }
@@ -143,24 +141,57 @@
             font-size: 1.5rem;
             cursor: pointer;
         }
+        .sidebar .user-info {
+            text-align: center;
+            padding: 15px 0 20px;
+            border-bottom: 1px solid #333;
+            margin-bottom: 20px;
+        }
+        .sidebar .user-info .avatar-large {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #e50914;
+            color: white;
+            text-align: center;
+            line-height: 60px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 auto 10px;
+            display: block;
+        }
+        .sidebar .user-info .username-display {
+            color: #fff;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .sidebar .user-info .user-role {
+            color: #888;
+            font-size: 0.8rem;
+        }
         .sidebar h3 {
             color: #e50914;
-            margin-bottom: 20px;
-            font-size: 1.2rem;
+            margin: 20px 0 15px;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .sidebar ul {
             list-style: none;
         }
         .sidebar ul li {
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
         .sidebar ul li a {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             padding: 10px 15px;
             color: #e5e5e5;
             text-decoration: none;
             border-radius: 6px;
             transition: all 0.3s;
+            font-size: 0.95rem;
         }
         .sidebar ul li a:hover {
             background: #2a2a2a;
@@ -170,15 +201,98 @@
             background: #e50914;
             color: #fff;
         }
-        .sidebar .adult-link {
-            border-left: 3px solid #e50914;
-            padding-left: 12px;
+        .sidebar ul li a .icon {
+            font-size: 1.2rem;
         }
         .sidebar .adult-link a {
             color: #ff4444;
         }
         .sidebar .adult-link a:hover {
             background: #2a0a0a;
+        }
+        .sidebar .upload-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background: #e50914;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s;
+            font-size: 0.95rem;
+        }
+        .sidebar .upload-btn:hover {
+            background: #ff0a1a;
+        }
+        .sidebar .logout-btn {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 6px;
+            background: transparent;
+            color: #888;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        .sidebar .logout-btn:hover {
+            border-color: #e50914;
+            color: #e50914;
+        }
+        .sidebar .leaderboard-preview {
+            margin-top: 20px;
+            padding: 15px;
+            background: #1a1a2e;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        .sidebar .leaderboard-preview h4 {
+            color: #ffd700;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        .sidebar .leaderboard-preview .lb-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 0;
+            font-size: 0.85rem;
+        }
+        .sidebar .leaderboard-preview .lb-item .rank {
+            color: #888;
+            width: 20px;
+        }
+        .sidebar .leaderboard-preview .lb-item .lb-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #2a2a3e;
+            text-align: center;
+            line-height: 24px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #fff;
+        }
+        .sidebar .leaderboard-preview .lb-item .lb-name {
+            flex: 1;
+        }
+        .sidebar .leaderboard-preview .lb-item .lb-views {
+            color: #888;
+            font-size: 0.8rem;
+        }
+        .sidebar .view-all-link {
+            display: block;
+            text-align: center;
+            color: #e50914;
+            text-decoration: none;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+        .sidebar .view-all-link:hover {
+            text-decoration: underline;
         }
 
         /* ===== OVERLAY ===== */
@@ -208,7 +322,7 @@
             border-bottom: 3px solid #e50914;
         }
         .hero h1 {
-            font-size: 3.5rem;
+            font-size: 3rem;
             max-width: 600px;
             margin-bottom: 15px;
         }
@@ -231,6 +345,19 @@
         }
         .hero .btn-play:hover {
             transform: scale(1.05);
+        }
+        .hero .stats-badge {
+            display: inline-block;
+            background: rgba(0,0,0,0.6);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 15px;
+        }
+        .hero .stats-badge span {
+            color: #fff;
+            font-weight: bold;
         }
 
         /* ===== MOVIE ROWS ===== */
@@ -350,7 +477,7 @@
             background: #2a0a0a;
         }
 
-        /* ===== MODAL (Upload/Login) ===== */
+        /* ===== MODAL ===== */
         .modal {
             display: none;
             position: fixed;
@@ -452,28 +579,28 @@
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .navbar { padding: 10px 15px; }
-            .navbar .brand a { font-size: 1.3rem; }
+            .navbar .brand a { font-size: 1.1rem; }
             .navbar .nav-links { display: none; }
-            .navbar .nav-right .upload-btn { padding: 6px 12px; font-size: 0.8rem; }
             .hero { padding: 40px 20px; margin-top: 60px; }
             .hero h1 { font-size: 2rem; }
             .row { padding: 15px 20px; }
             .movie-card { flex: 0 0 150px; }
             .movie-card .poster { height: 200px; font-size: 3rem; }
             .sidebar { width: 250px; left: -260px; }
-            .sidebar-toggle { left: 10px; }
+            .sidebar-toggle { top: 12px; left: 12px; }
+            .modal-content { padding: 25px; }
         }
         @media (max-width: 480px) {
             .movie-card { flex: 0 0 130px; }
             .movie-card .poster { height: 170px; font-size: 2.5rem; }
             .hero h1 { font-size: 1.5rem; }
-            .modal-content { padding: 25px; }
+            .sidebar { width: 220px; left: -230px; padding: 60px 15px 15px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== SIDEBAR TOGGLE ===== -->
+    <!-- ===== SIDEBAR TOGGLE (Top Left) ===== -->
     <div class="sidebar-toggle" onclick="toggleSidebar()">
         <span class="bar"></span>
         <span class="bar"></span>
@@ -483,23 +610,65 @@
     <!-- ===== SIDEBAR ===== -->
     <div class="sidebar" id="sidebar">
         <button class="close-btn" onclick="toggleSidebar()">✕</button>
+        
+        <!-- User Info -->
+        <div class="user-info">
+            {% if logged_in %}
+                <div class="avatar-large">
+                    {{ username[0].upper() if username else '?' }}
+                </div>
+                <div class="username-display">👤 {{ username }}</div>
+                <div class="user-role">{{ 'Admin' if session.get('role') == 'admin' else 'User' }}</div>
+            {% else %}
+                <div class="avatar-large">?</div>
+                <div class="username-display">Guest</div>
+                <div class="user-role">Not logged in</div>
+            {% endif %}
+        </div>
+        
+        <!-- Categories -->
         <h3>📂 Categories</h3>
         <ul>
             {% for cat in categories %}
                 <li>
-                    <a href="/category/{{ cat.id }}" 
-                       class="{% if cat.id == 'adult' %}adult-link{% endif %}"
-                       onclick="toggleSidebar()">
-                        {{ cat.icon }} {{ cat.name }}
+                    <a href="/category/{{ cat.id }}" onclick="toggleSidebar()" class="{% if cat.id == 'adult' %}adult-link{% endif %}">
+                        <span class="icon">{{ cat.icon }}</span> {{ cat.name }}
                     </a>
                 </li>
             {% endfor %}
         </ul>
-        <hr style="border-color: #333; margin: 20px 0;">
-        <div style="padding: 0 15px;">
-            <p style="color: #888; font-size: 0.8rem;">🎬 Movie FTP Server</p>
-            <p style="color: #555; font-size: 0.7rem; margin-top: 5px;">All movies hosted on FTP archive</p>
+        
+        <!-- Upload Button -->
+        {% if logged_in %}
+            <button class="upload-btn" onclick="closeSidebar(); openUploadModal();">📤 Upload Movies</button>
+            <a href="/dashboard" style="display: block; width: 100%; padding: 12px; border: 1px solid #333; border-radius: 6px; background: transparent; color: #e5e5e5; text-align: center; text-decoration: none; margin-top: 10px; font-size: 0.95rem;" onclick="toggleSidebar()">
+                📊 Dashboard
+            </a>
+            <button class="logout-btn" onclick="handleLogout()">🚪 Logout</button>
+        {% else %}
+            <a href="/register" style="display: block; width: 100%; padding: 12px; border: none; border-radius: 6px; background: #e50914; color: white; text-align: center; text-decoration: none; margin-top: 10px; font-weight: bold;" onclick="toggleSidebar()">
+                📝 Register / Login
+            </a>
+        {% endif %}
+        
+        <!-- Leaderboard Preview -->
+        <div class="leaderboard-preview">
+            <h4>🏆 Leaderboard</h4>
+            {% for user in leaderboard[:5] %}
+            <div class="lb-item">
+                <span class="rank">#{{ loop.index }}</span>
+                <span class="lb-avatar">{{ user.username[0].upper() if user.username else '?' }}</span>
+                <span class="lb-name">{{ user.username }}</span>
+                <span class="lb-views">{{ user.total_views }} views</span>
+            </div>
+            {% endfor %}
+            <a href="/leaderboard" class="view-all-link">View Full Leaderboard →</a>
         </div>
+        
+        <p style="color: #555; font-size: 0.7rem; text-align: center; margin-top: 20px;">
+            🎬 Movie FTP Server<br>
+            {{ user_count }} Users • {{ categories|length }} Categories
+        </p>
     </div>
 
     <!-- ===== OVERLAY ===== -->
@@ -516,8 +685,12 @@
             <li><a href="#adult-row">Adult 18+</a></li>
         </ul>
         <div class="nav-right">
-            <span class="user-badge" id="userBadge" style="display:none;">👤 <span id="usernameDisplay"></span></span>
-            <button class="upload-btn" onclick="openUploadModal()">📤 Upload Movies</button>
+            {% if logged_in %}
+                <span class="user-badge">
+                    <span class="avatar">{{ username[0].upper() if username else '?' }}</span>
+                    {{ username }}
+                </span>
+            {% endif %}
         </div>
     </nav>
 
@@ -528,6 +701,9 @@
         <button class="btn-play" onclick="document.getElementById('rows').scrollIntoView({behavior:'smooth'})">
             ▶ Browse Movies
         </button>
+        <div class="stats-badge">
+            📊 <span>{{ user_count }}</span> Users • <span>{{ categories|length }}</span> Categories • <span>{{ leaderboard|length if leaderboard else 0 }}</span> Top Creators
+        </div>
     </section>
 
     <!-- ===== MOVIE ROWS ===== -->
@@ -591,183 +767,3 @@
             </div>
         </div>
     </div>
-
-    <!-- ===== UPLOAD/LOGIN MODAL ===== -->
-    <div class="modal" id="uploadModal">
-        <div class="modal-content">
-            <h2>📤 Upload Movie</h2>
-            <div class="message" id="modalMessage"></div>
-            
-            <!-- Login Form (shown first) -->
-            <div id="loginForm">
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="loginUsername" placeholder="Enter username">
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="loginPassword" placeholder="Enter password">
-                </div>
-                <button class="btn-submit" onclick="handleLogin()">Login</button>
-            </div>
-            
-            <!-- Upload Form (shown after login) -->
-            <div id="uploadForm" style="display:none;">
-                <div class="form-group">
-                    <label>Category</label>
-                    <select id="uploadCategory">
-                        {% for cat in categories %}
-                        <option value="{{ cat.id }}">{{ cat.icon }} {{ cat.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Select Movie File</label>
-                    <input type="file" id="uploadFile" accept=".mp4,.mkv,.avi,.mov">
-                </div>
-                <button class="btn-submit" onclick="handleUpload()">Upload Movie</button>
-                <button class="btn-submit" style="background:#2a2a3e; margin-top:10px;" onclick="handleLogout()">Logout</button>
-            </div>
-            
-            <button class="btn-close" onclick="closeModal()">Close</button>
-        </div>
-    </div>
-
-    <script>
-        // ===== SIDEBAR TOGGLE =====
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('overlay').classList.toggle('active');
-        }
-
-        // ===== NAVBAR SCROLL EFFECT =====
-        window.addEventListener('scroll', function() {
-            const navbar = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-
-        // ===== MODAL FUNCTIONS =====
-        function openUploadModal() {
-            document.getElementById('uploadModal').classList.add('active');
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('uploadForm').style.display = 'none';
-            document.getElementById('modalMessage').className = 'message';
-            document.getElementById('modalMessage').textContent = '';
-            document.getElementById('loginUsername').value = '';
-            document.getElementById('loginPassword').value = '';
-            
-            // Check if already logged in
-            fetch('/api/check-auth')
-                .then(r => r.json())
-                .then(data => {
-                    if (data.logged_in) {
-                        showUploadForm(data.username);
-                    }
-                });
-        }
-
-        function closeModal() {
-            document.getElementById('uploadModal').classList.remove('active');
-        }
-
-        function showMessage(text, type) {
-            const msg = document.getElementById('modalMessage');
-            msg.textContent = text;
-            msg.className = 'message ' + type;
-        }
-
-        function showUploadForm(username) {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('uploadForm').style.display = 'block';
-            document.getElementById('userBadge').style.display = 'inline';
-            document.getElementById('usernameDisplay').textContent = username;
-        }
-
-        // ===== LOGIN =====
-        function handleLogin() {
-            const username = document.getElementById('loginUsername').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
-            
-            if (!username || !password) {
-                showMessage('Please enter username and password', 'error');
-                return;
-            }
-
-            fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.error) {
-                    showMessage(data.error, 'error');
-                } else {
-                    showMessage('Login successful!', 'success');
-                    setTimeout(() => showUploadForm(username), 500);
-                }
-            })
-            .catch(() => showMessage('Login failed', 'error'));
-        }
-
-        // ===== UPLOAD =====
-        function handleUpload() {
-            const category = document.getElementById('uploadCategory').value;
-            const fileInput = document.getElementById('uploadFile');
-            const file = fileInput.files[0];
-
-            if (!file) {
-                showMessage('Please select a movie file', 'error');
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('movie_file', file);
-            formData.append('category', category);
-
-            showMessage('Uploading... Please wait', 'success');
-
-            fetch('/api/upload', {
-                method: 'POST',
-                body: formData
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.error) {
-                    showMessage(data.error, 'error');
-                } else {
-                    showMessage(data.message, 'success');
-                    fileInput.value = '';
-                    setTimeout(() => location.reload(), 2000);
-                }
-            })
-            .catch(() => showMessage('Upload failed', 'error'));
-        }
-
-        // ===== LOGOUT =====
-        function handleLogout() {
-            fetch('/api/logout', { method: 'POST' })
-                .then(() => {
-                    document.getElementById('userBadge').style.display = 'none';
-                    document.getElementById('loginForm').style.display = 'block';
-                    document.getElementById('uploadForm').style.display = 'none';
-                    showMessage('Logged out', 'success');
-                });
-        }
-
-        // ===== CLOSE MODAL ON ESCAPE =====
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeModal();
-        });
-
-        // ===== CLICK OUTSIDE MODAL TO CLOSE =====
-        document.getElementById('uploadModal').addEventListener('click', function(e) {
-            if (e.target === this) closeModal();
-        });
-    </script>
-</body>
-</html>
