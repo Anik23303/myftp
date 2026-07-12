@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ category.name }} - Movie FTP</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #141414; color: #fff; min-height: 100vh; }
+        
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 10px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #141414;
+            border-bottom: 1px solid #333;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .navbar .brand a {
+            color: #e50914;
+            text-decoration: none;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        .navbar .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .navbar .nav-right a {
+            color: #e5e5e5;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .navbar .nav-right a:hover { color: #fff; }
+        .navbar .nav-right .upload-btn {
+            background: #e50914;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 90px 40px 40px;
+        }
+        .category-header {
+            margin-bottom: 30px;
+        }
+        .category-header h1 {
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .category-header .adult-badge {
+            background: #e50914;
+            font-size: 0.8rem;
+            padding: 4px 16px;
+            border-radius: 20px;
+        }
+        .category-header p {
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 25px;
+        }
+        .movie-card {
+            background: #1a1a2e;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #333;
+        }
+        .movie-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            border-color: #e50914;
+        }
+        .movie-card .poster {
+            height: 300px;
+            background: #2a2a3e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+        .movie-card .info {
+            padding: 15px;
+        }
+        .movie-card .info .title {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .movie-card .info .meta {
+            color: #888;
+            font-size: 0.8rem;
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+            flex-wrap: wrap;
+        }
+        .movie-card .info .meta span {
+            background: #2a2a3e;
+            padding: 2px 10px;
+            border-radius: 4px;
+        }
+        .movie-card .actions {
+            padding: 10px 15px 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .movie-card .actions a {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .btn-stream { background: #e50914; color: white; }
+        .btn-stream:hover { background: #ff0a1a; }
+        .btn-download { background: #2a2a3e; color: #ddd; }
+        .btn-download:hover { background: #3a3a5e; }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        .empty-state .icon { font-size: 4rem; display: block; margin-bottom: 20px; }
+        
+        .back-link {
+            display: inline-block;
+            color: #e50914;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+        .back-link:hover { text-decoration: underline; }
+        
+        @media (max-width: 768px) {
+            .container { padding: 80px 20px 20px; }
+            .movies-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+            .movie-card .poster { height: 200px; font-size: 3rem; }
+            .navbar { padding: 10px 15px; }
+            .category-header h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="brand"><a href="/">🎬 Movie FTP</a></div>
+        <div class="nav-right">
+            <a href="/">Home</a>
+            <button class="upload-btn" onclick="openUploadModal()">📤 Upload Movies</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <a href="/" class="back-link">← Back to home</a>
+        
+        <div class="category-header">
+            <h1>
+                {{ category.icon }} {{ category.name }}
+                {% if category.id == 'adult' %}
+                <span class="adult-badge">🔞 18+</span>
+                {% endif %}
+            </h1>
+            <p>{{ movies|length }} movies available</p>
+        </div>
+        
+        {% if movies %}
+        <div class="movies-grid">
+            {% for movie in movies %}
+            <div class="movie-card">
+                <div class="poster">{{ movie.get('poster', '🎬') }}</div>
+                <div class="info">
+                    <div class="title">{{ movie.title }}</div>
+                    <div class="meta">
+                        <span>{{ movie.year }}</span>
+                        <span>{{ movie.size }}</span>
+                        <span>{{ movie.format }}</span>
+                    </div>
+                </div>
+                <div class="actions">
+                    <a href="/stream/{{ category.id }}/{{ movie.filename }}" class="btn-stream">▶ Stream</a>
+                    <a href="/download/{{ category.id }}/{{ movie.filename }}" class="btn-download">⬇ Download</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <span class="icon">🎬</span>
+            <h2>No movies found</h2>
+            <p>This category is empty.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ===== MODAL (Same as index.html) ===== -->
+    <div class="modal" id="uploadModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; z-index:2000; background:rgba(0,0,0,0.8); align-items:center; justify-content:center;">
+        <div class="modal-content" style="background:#1a1a2e; padding:40px; border-radius:12px; max-width:400px; width:90%; border:1px solid #333;">
+            <h2 style="color:#e50914; margin-bottom:20px; text-align:center;">📤 Upload Movie</h2>
+            <div class="message" id="modalMessage" style="padding:10px; border-radius:6px; margin-bottom:15px; display:none;"></div>
+            
+            <div id="loginForm">
+                <div class="form-group" style="margin-bottom:15px;">
+                    <label style="display:block; margin-bottom:5px; font-weight:bold;">Username</label>
+                    <input type="text" id="loginUsername" style="width:100%; padding:10px; border:none; border-radius:6px; background:#2a2a3e; color:white;">
+                </div>
+                <div class="form-group" style="margin-bottom:15px;">
+                    <label style="display:block; margin-bottom:5px; font-weight:bold;">Password</label>
+                    <input type="password" id="loginPassword" style="width:100%; padding:10px; border:none; border-radius:6px; background:#2a2a3e; color:white;">
+                </div>
+                <button class="btn-submit" onclick="handleLogin()" style="width:100%; padding:12px; border:none; border-radius:6px; background:#e50914; color:white; font-weight:bold; cursor:pointer;">Login</button>
+            </div>
+            
+            <div id="uploadForm" style="display:none;">
+                <div class="form-group" style="margin-bottom:15px;">
+                    <label style="display:block; margin-bottom:5px; font-weight:bold;">Category</label>
+                    <select id="uploadCategory" style="width:100%; padding:10px; border:none; border-radius:6px; background:#2a2a3e; color:white;">
+                        {% for cat in categories %}
+                        <option value="{{ cat.id }}">{{ cat.icon }} {{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:15px;">
+                    <label style="display:block; margin-bottom:5px; font-weight:bold;">Select Movie File</label>
+                    <input type="file" id="uploadFile" accept=".mp4,.mkv,.avi,.mov" style="width:100%; padding:10px; border:none; border-radius:6px; background:#2a2a3e; color:white;">
+                </div>
+                <button class="btn-submit" onclick="handleUpload()" style="width:100%; padding:12px; border:none; border-radius:6px; background:#e50914; color:white; font-weight:bold; cursor:pointer;">Upload Movie</button>
+                <button onclick="handleLogout()" style="width:100%; margin-top:10px; padding:10px; border:none; border-radius:6px; background:#2a2a3e; color:#888; cursor:pointer;">Logout</button>
+            </div>
+            
+            <button onclick="closeModal()" style="width:100%; margin-top:10px; padding:10px; border:none; border-radius:6px; background:#2a2a3e; color:#888; cursor:pointer;">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // ===== MODAL FUNCTIONS =====
+        function openUploadModal() {
+            document.getElementById('uploadModal').style.display = 'flex';
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('uploadForm').style.display = 'none';
+            document.getElementById('modalMessage').style.display = 'none';
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+            
+            fetch('/api/check-auth')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.logged_in) {
+                        showUploadForm(data.username);
+                    }
+                });
+        }
+
+        function closeModal() {
+            document.getElementById('uploadModal').style.display = 'none';
+        }
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('modalMessage');
+            msg.textContent = text;
+            msg.style.display = 'block';
+            msg.style.background = type === 'success' ? '#1a3a1a' : '#3a1a1a';
+            msg.style.color = type === 'success' ? '#00ff00' : '#ff4444';
+            msg.style.border = '1px solid ' + (type === 'success' ? '#00ff00' : '#ff4444');
+        }
+
+        function showUploadForm(username) {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('uploadForm').style.display = 'block';
+        }
+
+        function handleLogin() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            if (!username || !password) {
+                showMessage('Please enter username and password', 'error');
+                return;
+            }
+            fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) {
+                    showMessage(data.error, 'error');
+                } else {
+                    showMessage('Login successful!', 'success');
+                    setTimeout(() => showUploadForm(username), 500);
+                }
+            });
+        }
+
+        function handleUpload() {
+            const category = document.getElementById('uploadCategory').value;
+            const fileInput = document.getElementById('uploadFile');
+            const file = fileInput.files[0];
+            if (!file) {
+                showMessage('Please select a movie file', 'error');
+                return;
+            }
+            const formData = new FormData();
+            formData.append('movie_file', file);
+            formData.append('category', category);
+            showMessage('Uploading...', 'success');
+            fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) {
+                    showMessage(data.error, 'error');
+                } else {
+                    showMessage(data.message, 'success');
+                    fileInput.value = '';
+                    setTimeout(() => location.reload(), 2000);
+                }
+            });
+        }
+
+        function handleLogout() {
+            fetch('/api/logout', { method: 'POST' })
+                .then(() => {
+                    document.getElementById('loginForm').style.display = 'block';
+                    document.getElementById('uploadForm').style.display = 'none';
+                    showMessage('Logged out', 'success');
+                });
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+        document.getElementById('uploadModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>
