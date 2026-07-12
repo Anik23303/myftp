@@ -1,4 +1,4 @@
-# Environment variables (DON'T commit these!)
+# Environment variables
 .env
 .env.local
 .env.*.local
@@ -48,5 +48,12 @@ tmp/
 temp/
 *.tmp
 
-# User data (don't commit)
+# Data files (don't commit these)
 users.json
+videos.json
+watch_history.json
+mylist.json
+
+# Uploads
+static/uploads/
+static/thumbnails/
