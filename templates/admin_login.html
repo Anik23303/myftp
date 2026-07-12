@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Movie FTP</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: #141414; 
+            color: #fff; 
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-container {
+            background: #1a1a2e;
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            max-width: 400px;
+            width: 90%;
+        }
+        .login-container h1 {
+            color: #e50914;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .login-container p {
+            color: #888;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background: #2a2a3e;
+            color: white;
+            font-size: 1rem;
+        }
+        .form-group input:focus {
+            outline: 2px solid #e50914;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background: #e50914;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-submit:hover {
+            background: #ff0a1a;
+        }
+        .flash {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        .flash.success {
+            background: #1a3a1a;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
+        .flash.error {
+            background: #3a1a1a;
+            color: #ff4444;
+            border: 1px solid #ff4444;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            color: #888;
+            text-decoration: none;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        .back-link:hover {
+            color: #e50914;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>🔐 Admin Login</h1>
+        <p>Access the admin panel</p>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST" action="/admin/login">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" required>
+            </div>
+            <button type="submit" class="btn-submit">Login</button>
+        </form>
+        
+        <a href="/" class="back-link">← Back to home</a>
+    </div>
+</body>
+</html>
