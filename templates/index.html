@@ -5,19 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎬 Movie FTP - Netflix Style</title>
     <style>
-        /* ===== RESET ===== */
+        /* ===== RESET & BASE ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             font-family: 'Helvetica Neue', Arial, sans-serif;
-            background: #141414; 
-            color: #fff; 
+            background: var(--bg-primary);
+            color: var(--text-primary);
             overflow-x: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        /* ===== THEME VARIABLES ===== */
+        :root {
+            --bg-primary: #141414;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #1a1a2e;
+            --bg-hover: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #e5e5e5;
+            --text-muted: #888888;
+            --border-color: #333333;
+            --accent: #e50914;
+            --accent-hover: #ff0a1a;
+            --shadow: rgba(0,0,0,0.8);
+            --success: #00ff00;
+            --gold: #ffd700;
+        }
+        
+        [data-theme="light"] {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-hover: #e8e8e8;
+            --text-primary: #141414;
+            --text-secondary: #333333;
+            --text-muted: #666666;
+            --border-color: #dddddd;
+            --shadow: rgba(0,0,0,0.1);
         }
         
         /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #141414; }
-        ::-webkit-scrollbar-thumb { background: #e50914; border-radius: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-hover); }
 
         /* ===== NAVBAR ===== */
         .navbar {
@@ -35,9 +66,12 @@
             flex-wrap: wrap;
             gap: 10px;
         }
+        [data-theme="light"] .navbar {
+            background: linear-gradient(to bottom, rgba(255,255,255,0.95) 0%, transparent 100%);
+        }
         .navbar.scrolled {
-            background: #141414;
-            border-bottom: 1px solid #333;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
         }
         .navbar .brand {
             display: flex;
@@ -45,7 +79,7 @@
             gap: 20px;
         }
         .navbar .brand a {
-            color: #e50914;
+            color: var(--accent);
             text-decoration: none;
             font-size: 1.5rem;
             font-weight: bold;
@@ -57,21 +91,35 @@
             list-style: none;
         }
         .navbar .nav-links a {
-            color: #e5e5e5;
+            color: var(--text-secondary);
             text-decoration: none;
             font-size: 0.9rem;
             transition: color 0.3s;
         }
-        .navbar .nav-links a:hover { color: #fff; }
-        .navbar .nav-links a.active { color: #fff; font-weight: bold; }
+        .navbar .nav-links a:hover { color: var(--text-primary); }
+        .navbar .nav-links a.active { color: var(--text-primary); font-weight: bold; }
         
         .navbar .nav-right {
             display: flex;
             align-items: center;
             gap: 15px;
         }
+        .navbar .nav-right .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .navbar .nav-right .theme-toggle:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
         .navbar .nav-right .user-badge {
-            color: #00ff00;
+            color: var(--success);
             font-size: 0.85rem;
         }
         .navbar .nav-right .user-badge .avatar {
@@ -79,7 +127,7 @@
             width: 30px;
             height: 30px;
             border-radius: 50%;
-            background: #e50914;
+            background: var(--accent);
             color: white;
             text-align: center;
             line-height: 30px;
@@ -95,22 +143,25 @@
             left: 15px;
             z-index: 1002;
             background: rgba(20,20,20,0.8);
-            border: 1px solid #333;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 8px 10px;
             cursor: pointer;
             transition: all 0.3s;
         }
+        [data-theme="light"] .sidebar-toggle {
+            background: rgba(255,255,255,0.8);
+        }
         .sidebar-toggle:hover {
-            background: #e50914;
-            border-color: #e50914;
+            background: var(--accent);
+            border-color: var(--accent);
         }
         .sidebar-toggle .bar {
             display: block;
             width: 22px;
             height: 2px;
             margin: 4px 0;
-            background: #fff;
+            background: var(--text-primary);
             transition: 0.3s;
         }
 
@@ -122,8 +173,8 @@
             bottom: 0;
             width: 280px;
             z-index: 1001;
-            background: #0a0a0a;
-            border-right: 1px solid #333;
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
             padding: 70px 20px 20px;
             transition: left 0.3s ease;
             overflow-y: auto;
@@ -137,21 +188,21 @@
             right: 15px;
             background: none;
             border: none;
-            color: #fff;
+            color: var(--text-primary);
             font-size: 1.5rem;
             cursor: pointer;
         }
         .sidebar .user-info {
             text-align: center;
             padding: 15px 0 20px;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid var(--border-color);
             margin-bottom: 20px;
         }
         .sidebar .user-info .avatar-large {
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: #e50914;
+            background: var(--accent);
             color: white;
             text-align: center;
             line-height: 60px;
@@ -159,18 +210,24 @@
             font-weight: bold;
             margin: 0 auto 10px;
             display: block;
+            overflow: hidden;
+        }
+        .sidebar .user-info .avatar-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .sidebar .user-info .username-display {
-            color: #fff;
+            color: var(--text-primary);
             font-weight: bold;
             font-size: 1.1rem;
         }
         .sidebar .user-info .user-role {
-            color: #888;
+            color: var(--text-muted);
             font-size: 0.8rem;
         }
         .sidebar h3 {
-            color: #e50914;
+            color: var(--accent);
             margin: 20px 0 15px;
             font-size: 1rem;
             text-transform: uppercase;
@@ -187,18 +244,18 @@
             align-items: center;
             gap: 12px;
             padding: 10px 15px;
-            color: #e5e5e5;
+            color: var(--text-secondary);
             text-decoration: none;
             border-radius: 6px;
             transition: all 0.3s;
             font-size: 0.95rem;
         }
         .sidebar ul li a:hover {
-            background: #2a2a2a;
-            color: #fff;
+            background: var(--bg-hover);
+            color: var(--text-primary);
         }
         .sidebar ul li a.active {
-            background: #e50914;
+            background: var(--accent);
             color: #fff;
         }
         .sidebar ul li a .icon {
@@ -215,7 +272,7 @@
             padding: 12px;
             border: none;
             border-radius: 6px;
-            background: #e50914;
+            background: var(--accent);
             color: white;
             font-weight: bold;
             cursor: pointer;
@@ -224,33 +281,51 @@
             font-size: 0.95rem;
         }
         .sidebar .upload-btn:hover {
-            background: #ff0a1a;
+            background: var(--accent-hover);
+        }
+        .sidebar .dashboard-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-secondary);
+            text-align: center;
+            text-decoration: none;
+            margin-top: 10px;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+        .sidebar .dashboard-btn:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
         }
         .sidebar .logout-btn {
             width: 100%;
             padding: 10px;
-            border: 1px solid #333;
+            border: 1px solid var(--border-color);
             border-radius: 6px;
             background: transparent;
-            color: #888;
+            color: var(--text-muted);
             cursor: pointer;
             margin-top: 10px;
             transition: all 0.3s;
             font-size: 0.9rem;
         }
         .sidebar .logout-btn:hover {
-            border-color: #e50914;
-            color: #e50914;
+            border-color: var(--accent);
+            color: var(--accent);
         }
         .sidebar .leaderboard-preview {
             margin-top: 20px;
             padding: 15px;
-            background: #1a1a2e;
+            background: var(--bg-secondary);
             border-radius: 8px;
-            border: 1px solid #333;
+            border: 1px solid var(--border-color);
         }
         .sidebar .leaderboard-preview h4 {
-            color: #ffd700;
+            color: var(--gold);
             font-size: 0.9rem;
             margin-bottom: 10px;
         }
@@ -262,31 +337,37 @@
             font-size: 0.85rem;
         }
         .sidebar .leaderboard-preview .lb-item .rank {
-            color: #888;
+            color: var(--text-muted);
             width: 20px;
         }
         .sidebar .leaderboard-preview .lb-item .lb-avatar {
             width: 24px;
             height: 24px;
             border-radius: 50%;
-            background: #2a2a3e;
+            background: var(--bg-hover);
             text-align: center;
             line-height: 24px;
             font-size: 0.7rem;
             font-weight: bold;
-            color: #fff;
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+        .sidebar .leaderboard-preview .lb-item .lb-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .sidebar .leaderboard-preview .lb-item .lb-name {
             flex: 1;
         }
         .sidebar .leaderboard-preview .lb-item .lb-views {
-            color: #888;
+            color: var(--text-muted);
             font-size: 0.8rem;
         }
         .sidebar .view-all-link {
             display: block;
             text-align: center;
-            color: #e50914;
+            color: var(--accent);
             text-decoration: none;
             font-size: 0.85rem;
             margin-top: 10px;
@@ -315,11 +396,10 @@
             margin-top: 70px;
             padding: 60px 40px;
             background: linear-gradient(to right, rgba(20,20,20,0.9) 30%, transparent),
-                        linear-gradient(to bottom, transparent, #141414),
-                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400"><rect fill="%231a1a2e" width="1000" height="400"/><text x="50" y="200" font-size="60" fill="%23e50914">🎬 Movie FTP</text></svg>');
-            background-size: cover;
-            background-position: center;
-            border-bottom: 3px solid #e50914;
+                        linear-gradient(to bottom, transparent, var(--bg-primary)),
+                        var(--bg-secondary);
+            border-bottom: 3px solid var(--accent);
+            position: relative;
         }
         .hero h1 {
             font-size: 3rem;
@@ -328,7 +408,7 @@
         }
         .hero p {
             font-size: 1.2rem;
-            color: #aaa;
+            color: var(--text-muted);
             max-width: 500px;
             margin-bottom: 20px;
         }
@@ -352,11 +432,21 @@
             padding: 8px 20px;
             border-radius: 20px;
             font-size: 0.9rem;
-            color: #888;
+            color: var(--text-muted);
             margin-top: 15px;
         }
         .hero .stats-badge span {
-            color: #fff;
+            color: var(--text-primary);
+            font-weight: bold;
+        }
+        .hero .trending-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
             font-weight: bold;
         }
 
@@ -367,14 +457,24 @@
         .row h2 {
             font-size: 1.4rem;
             margin-bottom: 15px;
-            color: #e5e5e5;
+            color: var(--text-secondary);
         }
         .row h2 .adult-badge {
-            background: #e50914;
+            background: var(--accent);
             font-size: 0.7rem;
             padding: 2px 12px;
             border-radius: 12px;
             margin-left: 10px;
+        }
+        .row h2 .view-all {
+            float: right;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-top: 5px;
+        }
+        .row h2 .view-all:hover {
+            color: var(--accent);
         }
         .row-scroll {
             display: flex;
@@ -384,27 +484,29 @@
             scroll-snap-type: x mandatory;
         }
         .row-scroll::-webkit-scrollbar { height: 6px; }
-        .row-scroll::-webkit-scrollbar-thumb { background: #e50914; border-radius: 3px; }
+        .row-scroll::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
 
+        /* ===== MOVIE CARD ===== */
         .movie-card {
             flex: 0 0 200px;
-            background: #1a1a2e;
+            background: var(--bg-card);
             border-radius: 8px;
             overflow: hidden;
             transition: transform 0.3s, box-shadow 0.3s;
             cursor: pointer;
             scroll-snap-align: start;
-            border: 1px solid #333;
+            border: 1px solid var(--border-color);
+            position: relative;
         }
         .movie-card:hover {
             transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            box-shadow: 0 10px 30px var(--shadow);
             z-index: 10;
-            border-color: #e50914;
+            border-color: var(--accent);
         }
         .movie-card .poster {
             height: 280px;
-            background: #2a2a3e;
+            background: var(--bg-hover);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -419,7 +521,28 @@
             padding: 4px 10px;
             border-radius: 4px;
             font-size: 0.8rem;
-            color: #ffd700;
+            color: var(--gold);
+        }
+        .movie-card .poster .trending-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--accent);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        .movie-card .poster .mylist-tag {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: var(--gold);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.7rem;
         }
         .movie-card .info {
             padding: 12px;
@@ -433,13 +556,13 @@
             text-overflow: ellipsis;
         }
         .movie-card .info .meta {
-            color: #888;
+            color: var(--text-muted);
             font-size: 0.8rem;
             display: flex;
             gap: 10px;
         }
         .movie-card .info .meta span {
-            background: #2a2a3e;
+            background: var(--bg-hover);
             padding: 2px 8px;
             border-radius: 4px;
         }
@@ -447,7 +570,7 @@
             display: none;
             padding: 10px;
             gap: 8px;
-            background: #1a1a2e;
+            background: var(--bg-card);
         }
         .movie-card:hover .hover-actions {
             display: flex;
@@ -460,21 +583,57 @@
             text-decoration: none;
             font-size: 0.8rem;
             font-weight: bold;
+            transition: all 0.3s;
         }
-        .btn-stream-sm { background: #e50914; color: white; }
-        .btn-download-sm { background: #2a2a3e; color: #ddd; }
-        .btn-stream-sm:hover { background: #ff0a1a; }
-        .btn-download-sm:hover { background: #3a3a5e; }
+        .btn-stream-sm { background: var(--accent); color: white; }
+        .btn-stream-sm:hover { background: var(--accent-hover); }
+        .btn-download-sm { background: var(--bg-hover); color: var(--text-secondary); }
+        .btn-download-sm:hover { background: var(--bg-hover); opacity: 0.8; }
+        .btn-mylist-sm { 
+            background: transparent; 
+            color: var(--gold); 
+            border: 1px solid var(--gold);
+        }
+        .btn-mylist-sm:hover { background: var(--gold); color: #141414; }
 
         /* ===== ADULT ROW STYLING ===== */
         .row.adult-row h2 {
             color: #ff4444;
         }
         .row.adult-row .movie-card {
-            border-color: #e50914;
+            border-color: var(--accent);
         }
         .row.adult-row .movie-card .poster {
             background: #2a0a0a;
+        }
+
+        /* ===== LOADING SKELETON ===== */
+        .skeleton {
+            flex: 0 0 200px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--bg-hover);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        .skeleton .skeleton-poster {
+            height: 280px;
+            background: var(--bg-hover);
+            opacity: 0.3;
+        }
+        .skeleton .skeleton-text {
+            height: 20px;
+            margin: 10px;
+            background: var(--bg-hover);
+            opacity: 0.3;
+            border-radius: 4px;
+        }
+        .skeleton .skeleton-text.short {
+            width: 60%;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
         }
 
         /* ===== MODAL ===== */
@@ -494,15 +653,15 @@
             display: flex;
         }
         .modal-content {
-            background: #1a1a2e;
+            background: var(--bg-secondary);
             padding: 40px;
             border-radius: 12px;
             max-width: 400px;
             width: 90%;
-            border: 1px solid #333;
+            border: 1px solid var(--border-color);
         }
         .modal-content h2 {
-            color: #e50914;
+            color: var(--accent);
             margin-bottom: 20px;
             text-align: center;
         }
@@ -521,20 +680,20 @@
             padding: 10px;
             border: none;
             border-radius: 6px;
-            background: #2a2a3e;
-            color: white;
+            background: var(--bg-hover);
+            color: var(--text-primary);
             font-size: 1rem;
         }
         .modal-content .form-group input:focus,
         .modal-content .form-group select:focus {
-            outline: 2px solid #e50914;
+            outline: 2px solid var(--accent);
         }
         .modal-content .btn-submit {
             width: 100%;
             padding: 12px;
             border: none;
             border-radius: 6px;
-            background: #e50914;
+            background: var(--accent);
             color: white;
             font-weight: bold;
             font-size: 1rem;
@@ -542,7 +701,7 @@
             transition: background 0.3s;
         }
         .modal-content .btn-submit:hover {
-            background: #ff0a1a;
+            background: var(--accent-hover);
         }
         .modal-content .btn-close {
             width: 100%;
@@ -550,12 +709,13 @@
             padding: 10px;
             border: none;
             border-radius: 6px;
-            background: #2a2a3e;
-            color: #888;
+            background: var(--bg-hover);
+            color: var(--text-muted);
             cursor: pointer;
         }
         .modal-content .btn-close:hover {
-            background: #3a3a5e;
+            background: var(--bg-hover);
+            opacity: 0.8;
         }
         .modal-content .message {
             padding: 10px;
@@ -566,14 +726,68 @@
         .modal-content .message.success {
             display: block;
             background: #1a3a1a;
-            color: #00ff00;
-            border: 1px solid #00ff00;
+            color: var(--success);
+            border: 1px solid var(--success);
         }
         .modal-content .message.error {
             display: block;
             background: #3a1a1a;
             color: #ff4444;
             border: 1px solid #ff4444;
+        }
+        .modal-content .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-hover);
+            border-radius: 3px;
+            margin: 15px 0;
+            overflow: hidden;
+            display: none;
+        }
+        .modal-content .progress-bar .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s;
+            border-radius: 3px;
+        }
+        .modal-content .progress-bar.active {
+            display: block;
+        }
+
+        /* ===== TOAST NOTIFICATIONS ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            padding: 15px 25px;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            box-shadow: 0 10px 30px var(--shadow);
+            animation: slideIn 0.3s ease;
+            min-width: 250px;
+            max-width: 400px;
+        }
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+        .toast.error {
+            border-left: 4px solid var(--accent);
+        }
+        .toast.info {
+            border-left: 4px solid var(--gold);
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         /* ===== RESPONSIVE ===== */
@@ -589,19 +803,23 @@
             .sidebar { width: 250px; left: -260px; }
             .sidebar-toggle { top: 12px; left: 12px; }
             .modal-content { padding: 25px; }
+            .skeleton { flex: 0 0 150px; }
+            .skeleton .skeleton-poster { height: 200px; }
         }
         @media (max-width: 480px) {
             .movie-card { flex: 0 0 130px; }
             .movie-card .poster { height: 170px; font-size: 2.5rem; }
             .hero h1 { font-size: 1.5rem; }
             .sidebar { width: 220px; left: -230px; padding: 60px 15px 15px; }
+            .skeleton { flex: 0 0 130px; }
+            .skeleton .skeleton-poster { height: 170px; }
         }
     </style>
 </head>
-<body>
+<body data-theme="{{ theme }}">
 
     <!-- ===== SIDEBAR TOGGLE (Top Left) ===== -->
-    <div class="sidebar-toggle" onclick="toggleSidebar()">
+    <div class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">
         <span class="bar"></span>
         <span class="bar"></span>
         <span class="bar"></span>
@@ -609,13 +827,17 @@
 
     <!-- ===== SIDEBAR ===== -->
     <div class="sidebar" id="sidebar">
-        <button class="close-btn" onclick="toggleSidebar()">✕</button>
+        <button class="close-btn" onclick="toggleSidebar()" title="Close Sidebar">✕</button>
         
         <!-- User Info -->
         <div class="user-info">
             {% if logged_in %}
                 <div class="avatar-large">
-                    {{ username[0].upper() if username else '?' }}
+                    {% if session and session.get('profile_pic') %}
+                        <img src="{{ session.get('profile_pic') }}" alt="{{ username }}">
+                    {% else %}
+                        {{ username[0].upper() if username else '?' }}
+                    {% endif %}
                 </div>
                 <div class="username-display">👤 {{ username }}</div>
                 <div class="user-role">{{ 'Admin' if session.get('role') == 'admin' else 'User' }}</div>
@@ -638,15 +860,15 @@
             {% endfor %}
         </ul>
         
-        <!-- Upload Button -->
+        <!-- User Actions -->
         {% if logged_in %}
             <button class="upload-btn" onclick="closeSidebar(); openUploadModal();">📤 Upload Movies</button>
-            <a href="/dashboard" style="display: block; width: 100%; padding: 12px; border: 1px solid #333; border-radius: 6px; background: transparent; color: #e5e5e5; text-align: center; text-decoration: none; margin-top: 10px; font-size: 0.95rem;" onclick="toggleSidebar()">
-                📊 Dashboard
-            </a>
+            <a href="/dashboard" class="dashboard-btn" onclick="toggleSidebar()">📊 Dashboard</a>
+            <a href="/mylist" class="dashboard-btn" onclick="toggleSidebar()">📋 My List</a>
+            <a href="/watch-history" class="dashboard-btn" onclick="toggleSidebar()">📜 Watch History</a>
             <button class="logout-btn" onclick="handleLogout()">🚪 Logout</button>
         {% else %}
-            <a href="/register" style="display: block; width: 100%; padding: 12px; border: none; border-radius: 6px; background: #e50914; color: white; text-align: center; text-decoration: none; margin-top: 10px; font-weight: bold;" onclick="toggleSidebar()">
+            <a href="/register" class="dashboard-btn" style="background: var(--accent); color: white; border: none; font-weight: bold;" onclick="toggleSidebar()">
                 📝 Register / Login
             </a>
         {% endif %}
@@ -657,7 +879,13 @@
             {% for user in leaderboard[:5] %}
             <div class="lb-item">
                 <span class="rank">#{{ loop.index }}</span>
-                <span class="lb-avatar">{{ user.username[0].upper() if user.username else '?' }}</span>
+                <span class="lb-avatar">
+                    {% if user.profile_pic %}
+                        <img src="{{ user.profile_pic }}" alt="{{ user.username }}">
+                    {% else %}
+                        {{ user.username[0].upper() if user.username else '?' }}
+                    {% endif %}
+                </span>
                 <span class="lb-name">{{ user.username }}</span>
                 <span class="lb-views">{{ user.total_views }} views</span>
             </div>
@@ -665,7 +893,7 @@
             <a href="/leaderboard" class="view-all-link">View Full Leaderboard →</a>
         </div>
         
-        <p style="color: #555; font-size: 0.7rem; text-align: center; margin-top: 20px;">
+        <p style="color: var(--text-muted); font-size: 0.7rem; text-align: center; margin-top: 20px;">
             🎬 Movie FTP Server<br>
             {{ user_count }} Users • {{ categories|length }} Categories
         </p>
@@ -673,6 +901,9 @@
 
     <!-- ===== OVERLAY ===== -->
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- ===== TOAST CONTAINER ===== -->
+    <div class="toast-container" id="toastContainer"></div>
 
     <!-- ===== NAVBAR ===== -->
     <nav class="navbar" id="navbar">
@@ -683,11 +914,21 @@
             <li><a href="/" class="active">Home</a></li>
             <li><a href="#rows">Movies</a></li>
             <li><a href="#adult-row">Adult 18+</a></li>
+            <li><a href="/leaderboard">🏆 Leaderboard</a></li>
         </ul>
         <div class="nav-right">
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
+                {% if theme == 'dark' %}☀️ Light{% else %}🌙 Dark{% endif %}
+            </button>
             {% if logged_in %}
                 <span class="user-badge">
-                    <span class="avatar">{{ username[0].upper() if username else '?' }}</span>
+                    <span class="avatar">
+                        {% if session and session.get('profile_pic') %}
+                            <img src="{{ session.get('profile_pic') }}" alt="{{ username }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+                        {% else %}
+                            {{ username[0].upper() if username else '?' }}
+                        {% endif %}
+                    </span>
                     {{ username }}
                 </span>
             {% endif %}
@@ -696,6 +937,7 @@
 
     <!-- ===== HERO BANNER ===== -->
     <section class="hero">
+        <div class="trending-badge">🔥 Trending Now</div>
         <h1>🎬 Movie FTP</h1>
         <p>Browse, stream, and download movies from our FTP archive. Thousands of movies available.</p>
         <button class="btn-play" onclick="document.getElementById('rows').scrollIntoView({behavior:'smooth'})">
@@ -708,15 +950,52 @@
 
     <!-- ===== MOVIE ROWS ===== -->
     <div id="rows">
+
+        <!-- ===== TRENDING ROW ===== -->
+        {% if trending %}
+        <div class="row">
+            <h2>🔥 Trending Now</h2>
+            <div class="row-scroll">
+                {% for movie in trending %}
+                <div class="movie-card" onclick="window.location.href='/stream/{{ movie.category }}/{{ movie.filename }}'">
+                    <div class="poster" style="background: {{ movie.get('thumbnail_color', '#2a2a3e') }};">
+                        {{ movie.get('poster', '🎬') }}
+                        <span class="trending-tag">🔥 Trending</span>
+                        {% if movie.rating %}
+                        <span class="rating">⭐ {{ movie.rating }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="info">
+                        <div class="title">{{ movie.title }}</div>
+                        <div class="meta">
+                            <span>{{ movie.year }}</span>
+                            <span>{{ movie.size }}</span>
+                        </div>
+                    </div>
+                    <div class="hover-actions">
+                        <a href="/stream/{{ movie.category }}/{{ movie.filename }}" class="btn-stream-sm">▶ Stream</a>
+                        <a href="/download/{{ movie.category }}/{{ movie.filename }}" class="btn-download-sm">⬇ Download</a>
+                        <button class="btn-mylist-sm" onclick="event.stopPropagation(); addToMyList('{{ movie.id }}')">📋</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ===== REGULAR CATEGORIES ===== -->
         {% for cat in categories %}
             {% if cat.id != 'adult' %}
             <div class="row">
-                <h2>{{ cat.icon }} {{ cat.name }}</h2>
+                <h2>
+                    {{ cat.icon }} {{ cat.name }}
+                    <a href="/category/{{ cat.id }}" class="view-all">View All →</a>
+                </h2>
                 <div class="row-scroll">
                     {% set movies = get_movie_listing(cat.id) %}
                     {% for movie in movies[:10] %}
-                    <div class="movie-card">
-                        <div class="poster">
+                    <div class="movie-card" onclick="window.location.href='/stream/{{ cat.id }}/{{ movie.filename }}'">
+                        <div class="poster" style="background: {{ movie.get('thumbnail_color', '#2a2a3e') }};">
                             {{ movie.get('poster', '🎬') }}
                             {% if movie.rating %}
                             <span class="rating">⭐ {{ movie.rating }}</span>
@@ -732,6 +1011,7 @@
                         <div class="hover-actions">
                             <a href="/stream/{{ cat.id }}/{{ movie.filename }}" class="btn-stream-sm">▶ Stream</a>
                             <a href="/download/{{ cat.id }}/{{ movie.filename }}" class="btn-download-sm">⬇ Download</a>
+                            <button class="btn-mylist-sm" onclick="event.stopPropagation(); addToMyList('{{ movie.id }}')">📋</button>
                         </div>
                     </div>
                     {% endfor %}
@@ -742,14 +1022,17 @@
 
         <!-- ===== ADULT 18+ ROW ===== -->
         <div class="row adult-row" id="adult-row">
-            <h2>🔞 Adult 18+ <span class="adult-badge">18+</span></h2>
+            <h2>
+                🔞 Adult 18+ <span class="adult-badge">18+</span>
+                <a href="/category/adult" class="view-all">View All →</a>
+            </h2>
             <div class="row-scroll">
                 {% set adult_movies = get_movie_listing('adult') %}
                 {% for movie in adult_movies[:10] %}
-                <div class="movie-card">
-                    <div class="poster" style="background:#2a0a0a;">
+                <div class="movie-card" onclick="window.location.href='/stream/adult/{{ movie.filename }}'">
+                    <div class="poster" style="background: {{ movie.get('thumbnail_color', '#2a0a0a') }};">
                         🔞
-                        <span class="rating" style="background:#e50914;">18+</span>
+                        <span class="rating" style="background:var(--accent);">18+</span>
                     </div>
                     <div class="info">
                         <div class="title">{{ movie.title }}</div>
@@ -773,10 +1056,13 @@
         <div class="modal-content">
             <h2>📤 Upload Movie</h2>
             <div class="message" id="modalMessage"></div>
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
             
             <!-- Login Form -->
             <div id="loginForm">
-                <p style="color: #888; margin-bottom: 15px; text-align: center;">Please login to upload</p>
+                <p style="color: var(--text-muted); margin-bottom: 15px; text-align: center;">Please login to upload</p>
                 <div class="form-group">
                     <label>Username</label>
                     <input type="text" id="loginUsername" placeholder="Enter username">
@@ -804,7 +1090,7 @@
                 </div>
                 <div class="form-group">
                     <label>Select Movie File</label>
-                    <input type="file" id="uploadFile" accept=".mp4,.mkv,.avi,.mov">
+                    <input type="file" id="uploadFile" accept=".mp4,.mkv,.avi,.mov" onchange="showUploadProgress()">
                 </div>
                 <button class="btn-submit" onclick="handleUpload()">Upload Movie</button>
             </div>
@@ -834,6 +1120,27 @@
             }
         });
 
+        // ===== THEME TOGGLE =====
+        function toggleTheme() {
+            fetch('/toggle-theme')
+                .then(() => location.reload());
+        }
+
+        // ===== TOAST NOTIFICATIONS =====
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
         // ===== MODAL FUNCTIONS =====
         function openUploadModal() {
             document.getElementById('uploadModal').classList.add('active');
@@ -843,6 +1150,8 @@
             document.getElementById('modalMessage').textContent = '';
             document.getElementById('loginUsername').value = '';
             document.getElementById('loginPassword').value = '';
+            document.getElementById('progressBar').classList.remove('active');
+            document.getElementById('progressFill').style.width = '0%';
             
             fetch('/api/check-auth')
                 .then(r => r.json())
@@ -866,6 +1175,18 @@
         function showUploadForm(username) {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('uploadForm').style.display = 'block';
+            showToast(`Welcome ${username}! You can now upload movies.`, 'success');
+        }
+
+        function showUploadProgress() {
+            document.getElementById('progressBar').classList.add('active');
+            const fileInput = document.getElementById('uploadFile');
+            if (fileInput.files[0]) {
+                const size = fileInput.files[0].size;
+                if (size > 100 * 1024 * 1024) {
+                    showToast('Large file detected. Upload may take a while.', 'info');
+                }
+            }
         }
 
         // ===== LOGIN =====
@@ -887,15 +1208,20 @@
             .then(data => {
                 if (data.error) {
                     showMessage(data.error, 'error');
+                    showToast(data.error, 'error');
                 } else {
                     showMessage('Login successful!', 'success');
+                    showToast('Login successful!', 'success');
                     setTimeout(() => {
                         showUploadForm(username);
                         location.reload();
                     }, 500);
                 }
             })
-            .catch(() => showMessage('Login failed', 'error'));
+            .catch(() => {
+                showMessage('Login failed', 'error');
+                showToast('Login failed', 'error');
+            });
         }
 
         // ===== UPLOAD =====
@@ -916,6 +1242,15 @@
             if (title) formData.append('title', title);
 
             showMessage('Uploading... Please wait', 'success');
+            document.getElementById('progressBar').classList.add('active');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                if (progress <= 90) {
+                    document.getElementById('progressFill').style.width = progress + '%';
+                }
+            }, 300);
 
             fetch('/api/upload', {
                 method: 'POST',
@@ -923,25 +1258,60 @@
             })
             .then(r => r.json())
             .then(data => {
+                clearInterval(interval);
+                document.getElementById('progressFill').style.width = '100%';
+                
                 if (data.error) {
                     showMessage(data.error, 'error');
+                    showToast(data.error, 'error');
                 } else {
                     showMessage(data.message, 'success');
+                    showToast('✅ ' + data.message, 'success');
                     fileInput.value = '';
                     document.getElementById('uploadTitle').value = '';
+                    document.getElementById('progressFill').style.width = '0%';
                     setTimeout(() => location.reload(), 2000);
                 }
             })
-            .catch(() => showMessage('Upload failed', 'error'));
+            .catch(() => {
+                clearInterval(interval);
+                showMessage('Upload failed', 'error');
+                showToast('Upload failed', 'error');
+            });
+        }
+
+        // ===== MY LIST =====
+        function addToMyList(videoId) {
+            if (!videoId) {
+                showToast('Please login first', 'error');
+                return;
+            }
+            
+            fetch(`/api/mylist/add/${videoId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('✅ Added to My List!', 'success');
+                } else {
+                    showToast('Already in My List', 'info');
+                }
+            })
+            .catch(() => showToast('Error adding to My List', 'error'));
         }
 
         // ===== LOGOUT =====
         function handleLogout() {
-            fetch('/api/logout', { method: 'POST' })
-                .then(() => {
-                    closeSidebar();
-                    location.reload();
-                });
+            if (confirm('Are you sure you want to logout?')) {
+                fetch('/api/logout', { method: 'POST' })
+                    .then(() => {
+                        closeSidebar();
+                        showToast('Logged out successfully', 'success');
+                        setTimeout(() => location.reload(), 500);
+                    });
+            }
         }
 
         // ===== CLOSE MODAL ON ESCAPE =====
@@ -952,6 +1322,32 @@
         // ===== CLICK OUTSIDE MODAL TO CLOSE =====
         document.getElementById('uploadModal').addEventListener('click', function(e) {
             if (e.target === this) closeModal();
+        });
+
+        // ===== KEYBOARD SHORTCUTS =====
+        document.addEventListener('keydown', function(e) {
+            // Ctrl + K = Open search
+            if (e.ctrlKey && e.key === 'k') {
+                e.preventDefault();
+                document.querySelector('.search-bar input')?.focus();
+            }
+            // Escape = Close sidebar
+            if (e.key === 'Escape') {
+                closeSidebar();
+            }
+        });
+
+        // ===== SIDEBAR AUTO-CLOSE ON MOBILE =====
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                    if (sidebar.classList.contains('open')) {
+                        toggleSidebar();
+                    }
+                }
+            }
         });
     </script>
 </body>
