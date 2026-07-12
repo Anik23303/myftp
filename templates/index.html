@@ -480,4 +480,294 @@
         <span class="bar"></span>
     </div>
 
-    <!-- =
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" onclick="toggleSidebar()">✕</button>
+        <h3>📂 Categories</h3>
+        <ul>
+            {% for cat in categories %}
+                <li>
+                    <a href="/category/{{ cat.id }}" 
+                       class="{% if cat.id == 'adult' %}adult-link{% endif %}"
+                       onclick="toggleSidebar()">
+                        {{ cat.icon }} {{ cat.name }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+        <hr style="border-color: #333; margin: 20px 0;">
+        <div style="padding: 0 15px;">
+            <p style="color: #888; font-size: 0.8rem;">🎬 Movie FTP Server</p>
+            <p style="color: #555; font-size: 0.7rem; margin-top: 5px;">All movies hosted on FTP archive</p>
+        </div>
+    </div>
+
+    <!-- ===== OVERLAY ===== -->
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar" id="navbar">
+        <div class="brand">
+            <a href="/">🎬 Movie FTP</a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/" class="active">Home</a></li>
+            <li><a href="#rows">Movies</a></li>
+            <li><a href="#adult-row">Adult 18+</a></li>
+        </ul>
+        <div class="nav-right">
+            <span class="user-badge" id="userBadge" style="display:none;">👤 <span id="usernameDisplay"></span></span>
+            <button class="upload-btn" onclick="openUploadModal()">📤 Upload Movies</button>
+        </div>
+    </nav>
+
+    <!-- ===== HERO BANNER ===== -->
+    <section class="hero">
+        <h1>🎬 Movie FTP</h1>
+        <p>Browse, stream, and download movies from our FTP archive. Thousands of movies available.</p>
+        <button class="btn-play" onclick="document.getElementById('rows').scrollIntoView({behavior:'smooth'})">
+            ▶ Browse Movies
+        </button>
+    </section>
+
+    <!-- ===== MOVIE ROWS ===== -->
+    <div id="rows">
+        {% for cat in categories %}
+            {% if cat.id != 'adult' %}
+            <div class="row">
+                <h2>{{ cat.icon }} {{ cat.name }}</h2>
+                <div class="row-scroll">
+                    {% set movies = get_movie_listing(cat.id) %}
+                    {% for movie in movies[:10] %}
+                    <div class="movie-card">
+                        <div class="poster">
+                            {{ movie.get('poster', '🎬') }}
+                            {% if movie.rating %}
+                            <span class="rating">⭐ {{ movie.rating }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="info">
+                            <div class="title">{{ movie.title }}</div>
+                            <div class="meta">
+                                <span>{{ movie.year }}</span>
+                                <span>{{ movie.size }}</span>
+                            </div>
+                        </div>
+                        <div class="hover-actions">
+                            <a href="/stream/{{ cat.id }}/{{ movie.filename }}" class="btn-stream-sm">▶ Stream</a>
+                            <a href="/download/{{ cat.id }}/{{ movie.filename }}" class="btn-download-sm">⬇ Download</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+
+        <!-- ===== ADULT 18+ ROW ===== -->
+        <div class="row adult-row" id="adult-row">
+            <h2>🔞 Adult 18+ <span class="adult-badge">18+</span></h2>
+            <div class="row-scroll">
+                {% set adult_movies = get_movie_listing('adult') %}
+                {% for movie in adult_movies[:10] %}
+                <div class="movie-card">
+                    <div class="poster" style="background:#2a0a0a;">
+                        🔞
+                        <span class="rating" style="background:#e50914;">18+</span>
+                    </div>
+                    <div class="info">
+                        <div class="title">{{ movie.title }}</div>
+                        <div class="meta">
+                            <span>{{ movie.year }}</span>
+                            <span>{{ movie.size }}</span>
+                        </div>
+                    </div>
+                    <div class="hover-actions">
+                        <a href="/stream/adult/{{ movie.filename }}" class="btn-stream-sm">▶ Stream</a>
+                        <a href="/download/adult/{{ movie.filename }}" class="btn-download-sm">⬇ Download</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== UPLOAD/LOGIN MODAL ===== -->
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <h2>📤 Upload Movie</h2>
+            <div class="message" id="modalMessage"></div>
+            
+            <!-- Login Form (shown first) -->
+            <div id="loginForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="loginUsername" placeholder="Enter username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter password">
+                </div>
+                <button class="btn-submit" onclick="handleLogin()">Login</button>
+            </div>
+            
+            <!-- Upload Form (shown after login) -->
+            <div id="uploadForm" style="display:none;">
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="uploadCategory">
+                        {% for cat in categories %}
+                        <option value="{{ cat.id }}">{{ cat.icon }} {{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Select Movie File</label>
+                    <input type="file" id="uploadFile" accept=".mp4,.mkv,.avi,.mov">
+                </div>
+                <button class="btn-submit" onclick="handleUpload()">Upload Movie</button>
+                <button class="btn-submit" style="background:#2a2a3e; margin-top:10px;" onclick="handleLogout()">Logout</button>
+            </div>
+            
+            <button class="btn-close" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // ===== SIDEBAR TOGGLE =====
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        // ===== NAVBAR SCROLL EFFECT =====
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // ===== MODAL FUNCTIONS =====
+        function openUploadModal() {
+            document.getElementById('uploadModal').classList.add('active');
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('uploadForm').style.display = 'none';
+            document.getElementById('modalMessage').className = 'message';
+            document.getElementById('modalMessage').textContent = '';
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+            
+            // Check if already logged in
+            fetch('/api/check-auth')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.logged_in) {
+                        showUploadForm(data.username);
+                    }
+                });
+        }
+
+        function closeModal() {
+            document.getElementById('uploadModal').classList.remove('active');
+        }
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('modalMessage');
+            msg.textContent = text;
+            msg.className = 'message ' + type;
+        }
+
+        function showUploadForm(username) {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('uploadForm').style.display = 'block';
+            document.getElementById('userBadge').style.display = 'inline';
+            document.getElementById('usernameDisplay').textContent = username;
+        }
+
+        // ===== LOGIN =====
+        function handleLogin() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            
+            if (!username || !password) {
+                showMessage('Please enter username and password', 'error');
+                return;
+            }
+
+            fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) {
+                    showMessage(data.error, 'error');
+                } else {
+                    showMessage('Login successful!', 'success');
+                    setTimeout(() => showUploadForm(username), 500);
+                }
+            })
+            .catch(() => showMessage('Login failed', 'error'));
+        }
+
+        // ===== UPLOAD =====
+        function handleUpload() {
+            const category = document.getElementById('uploadCategory').value;
+            const fileInput = document.getElementById('uploadFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showMessage('Please select a movie file', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('movie_file', file);
+            formData.append('category', category);
+
+            showMessage('Uploading... Please wait', 'success');
+
+            fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) {
+                    showMessage(data.error, 'error');
+                } else {
+                    showMessage(data.message, 'success');
+                    fileInput.value = '';
+                    setTimeout(() => location.reload(), 2000);
+                }
+            })
+            .catch(() => showMessage('Upload failed', 'error'));
+        }
+
+        // ===== LOGOUT =====
+        function handleLogout() {
+            fetch('/api/logout', { method: 'POST' })
+                .then(() => {
+                    document.getElementById('userBadge').style.display = 'none';
+                    document.getElementById('loginForm').style.display = 'block';
+                    document.getElementById('uploadForm').style.display = 'none';
+                    showMessage('Logged out', 'success');
+                });
+        }
+
+        // ===== CLOSE MODAL ON ESCAPE =====
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // ===== CLICK OUTSIDE MODAL TO CLOSE =====
+        document.getElementById('uploadModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>
