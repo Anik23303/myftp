@@ -236,7 +236,7 @@
             margin-top: 10px;
         }
         
-        /* ===== SOCIAL/DEMO NOTE ===== */
+        /* ===== DEMO NOTE (User Only - No Admin) ===== */
         .demo-note {
             text-align: center;
             margin-top: 15px;
@@ -264,6 +264,28 @@
             font-weight: bold;
             color: var(--text-secondary);
             font-family: monospace;
+        }
+        
+        /* ===== ADMIN WARNING ===== */
+        .admin-warning {
+            text-align: center;
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: rgba(229, 9, 20, 0.1);
+            border-radius: 6px;
+            border: 1px solid rgba(229, 9, 20, 0.3);
+        }
+        .admin-warning p {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+        .admin-warning p a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .admin-warning p a:hover {
+            text-decoration: underline;
         }
         
         /* ===== THEME TOGGLE ===== */
@@ -355,16 +377,21 @@
             </button>
         </form>
         
-        <!-- ===== DEMO CREDENTIALS NOTE ===== -->
+        <!-- ===== DEMO CREDENTIALS (User Only - NO ADMIN) ===== -->
         <div class="demo-note">
-            <p>💡 <strong>Demo Credentials</strong></p>
+            <p>💡 <strong>Demo User Credentials</strong></p>
             <div class="demo-credentials">
-                <span>👤 admin</span>
-                <span>🔑 admin123</span>
+                <span>👤 demo_user</span>
+                <span>🔑 demo123</span>
             </div>
             <p style="margin-top:5px; font-size:0.7rem; color: var(--text-muted);">
-                Or create your own account by registering!
+                Create your own account by registering!
             </p>
+        </div>
+        
+        <!-- ===== ADMIN WARNING ===== -->
+        <div class="admin-warning">
+            <p>🔐 Admin login is only available at: <a href="/admin">/admin</a></p>
         </div>
         
         <div class="links">
@@ -397,22 +424,12 @@
             const btn = document.getElementById('loginBtn');
             btn.innerHTML = '⏳ Logging in...';
             btn.disabled = true;
-            // Form will submit normally, button text resets on page load
         });
 
         // ===== KEYBOARD SHORTCUTS =====
         document.addEventListener('keydown', function(e) {
-            // Escape to go back
             if (e.key === 'Escape') {
                 window.location.href = '/';
-            }
-            // Ctrl + Shift + R to use demo credentials
-            if (e.ctrlKey && e.shiftKey && (e.key === 'r' || e.key === 'R')) {
-                e.preventDefault();
-                document.getElementById('usernameInput').value = 'admin';
-                document.getElementById('passwordInput').value = 'admin123';
-                document.getElementById('rememberMe').checked = true;
-                showFlash('✅ Demo credentials filled! Click Login.', 'success');
             }
         });
 
@@ -421,34 +438,7 @@
             document.getElementById('usernameInput').focus();
         });
 
-        // ===== FLASH MESSAGES (for validation) =====
-        function showFlash(message, type = 'success') {
-            const container = document.querySelector('.login-container');
-            const existing = container.querySelector('.flash');
-            if (existing) existing.remove();
-            
-            const flash = document.createElement('div');
-            flash.className = `flash ${type}`;
-            flash.textContent = message;
-            container.insertBefore(flash, document.getElementById('loginForm'));
-            
-            setTimeout(() => {
-                if (flash) flash.remove();
-            }, 5000);
-        }
-
-        // ===== SHOW/HIDE PASSWORD WITH KEYBOARD =====
-        document.addEventListener('keydown', function(e) {
-            // Ctrl + Shift + P to toggle password visibility
-            if (e.ctrlKey && e.shiftKey && (e.key === 'p' || e.key === 'P')) {
-                e.preventDefault();
-                togglePassword();
-            }
-        });
-
-        console.log('🎬 Keyboard Shortcuts:');
-        console.log('  Ctrl+Shift+R = Fill demo credentials');
-        console.log('  Ctrl+Shift+P = Toggle password visibility');
+        console.log('🎬 Login Page - Keyboard Shortcuts:');
         console.log('  Escape = Go back home');
     </script>
 </body>
