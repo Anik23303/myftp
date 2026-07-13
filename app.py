@@ -140,11 +140,9 @@ def get_leaderboard(time_filter='all'):
     users = load_users()
     videos = load_videos()
     
-    # Filter users with role 'user'
     user_list = []
     for username, data in users.items():
         if data.get('role') != 'admin' and username != 'admin':
-            # Calculate views based on time filter
             total_views = 0
             for vid in videos.values():
                 if vid.get('uploaded_by') == username:
@@ -167,7 +165,6 @@ def get_leaderboard(time_filter='all'):
                 'total_uploads': data.get('total_uploads', 0)
             })
     
-    # Sort by total views descending
     user_list.sort(key=lambda x: x['total_views'], reverse=True)
     return user_list[:10]
 
@@ -180,16 +177,13 @@ def get_video_stats():
     total_views = sum(v.get('views', 0) for v in videos.values())
     total_users = len([u for u in users.values() if u.get('role') != 'admin'])
     
-    # Views per category
     category_views = {}
     for vid in videos.values():
         cat = vid.get('category', 'unknown')
         category_views[cat] = category_views.get(cat, 0) + vid.get('views', 0)
     
-    # Most viewed videos
     most_viewed = sorted(videos.values(), key=lambda x: x.get('views', 0), reverse=True)[:10]
     
-    # User growth (last 7 days)
     growth = []
     for i in range(7, -1, -1):
         date = (datetime.now() - timedelta(days=i)).date().isoformat()
@@ -216,7 +210,6 @@ def increment_views(video_id):
     if video_id in videos:
         videos[video_id]['views'] = videos[video_id].get('views', 0) + 1
         save_videos(videos)
-        # Update user's total views
         uploaded_by = videos[video_id].get('uploaded_by')
         if uploaded_by:
             update_user_total_views(uploaded_by)
@@ -224,9 +217,7 @@ def increment_views(video_id):
     return False
 
 def generate_thumbnail(filename):
-    """Generate placeholder thumbnail (simplified)"""
-    # In production, you'd use ffmpeg or similar
-    # For now, return a colored gradient based on filename hash
+    """Generate placeholder thumbnail"""
     import hashlib
     hash_val = int(hashlib.md5(filename.encode()).hexdigest()[:8], 16)
     colors = ['#e50914', '#ff6b35', '#00b4d8', '#7b2cbf', '#ffd700', '#06d6a0']
@@ -238,16 +229,13 @@ def add_to_watch_history(username, video_id):
     if username not in history:
         history[username] = []
     
-    # Remove if already exists (move to top)
     history[username] = [v for v in history[username] if v['video_id'] != video_id]
     
-    # Add to top
     history[username].insert(0, {
         'video_id': video_id,
         'watched_at': datetime.now().isoformat()
     })
     
-    # Keep only last 100 items
     history[username] = history[username][:100]
     save_watch_history(history)
 
@@ -257,7 +245,6 @@ def add_to_mylist(username, video_id):
     if username not in mylist:
         mylist[username] = []
     
-    # Check if already exists
     if video_id not in mylist[username]:
         mylist[username].append(video_id)
         save_mylist(mylist)
@@ -503,7 +490,6 @@ def index():
                          logged_in='username' in session,
                          username=session.get('username', ''),
                          leaderboard=leaderboard,
-                         user_count=len([u for u in users.values() if u.get('role') != 'admin']),
                          theme=session.get('theme', 'dark'))
 
 @app.route('/category/<category_id>')
@@ -523,7 +509,6 @@ def category_movies(category_id):
 @app.route('/stream/<category>/<filename>')
 def stream_movie(category, filename):
     try:
-        # Check if this is a user-uploaded video
         videos = load_videos()
         video_id = None
         for vid_id, vid in videos.items():
@@ -533,7 +518,6 @@ def stream_movie(category, filename):
         
         if video_id:
             increment_views(video_id)
-            # Add to watch history if user is logged in
             if 'username' in session:
                 add_to_watch_history(session['username'], video_id)
         
@@ -623,7 +607,6 @@ def register():
         flash('Username already exists', 'error')
         return redirect(url_for('register'))
     
-    # Save profile picture
     profile_pic_path = ""
     if profile_pic and profile_pic.filename:
         os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -676,7 +659,6 @@ def logout():
 
 @app.route('/toggle-theme')
 def toggle_theme():
-    """Toggle dark/light theme"""
     current = session.get('theme', 'dark')
     session['theme'] = 'light' if current == 'dark' else 'dark'
     return redirect(request.referrer or '/')
@@ -710,7 +692,6 @@ def check_auth():
 
 @app.route('/api/leaderboard', methods=['GET'])
 def api_leaderboard():
-    """Get real-time leaderboard data"""
     time_filter = request.args.get('filter', 'all')
     leaderboard = get_leaderboard(time_filter)
     return jsonify({'leaderboard': leaderboard})
@@ -718,7 +699,6 @@ def api_leaderboard():
 @app.route('/api/user-stats', methods=['GET'])
 @login_required
 def api_user_stats():
-    """Get user's video statistics"""
     username = session.get('username')
     videos = get_user_videos(username)
     total_videos = len(videos)
@@ -754,7 +734,6 @@ def api_user_stats():
 @app.route('/api/video/<video_id>/rate', methods=['POST'])
 @login_required
 def api_rate_video(video_id):
-    """Rate a video (1-5 stars)"""
     data = request.json
     rating = data.get('rating', 0)
     if rating < 1 or rating > 5:
@@ -771,7 +750,6 @@ def api_rate_video(video_id):
 @app.route('/api/mylist', methods=['GET', 'POST', 'DELETE'])
 @login_required
 def api_mylist():
-    """Manage My List"""
     username = session.get('username')
     
     if request.method == 'GET':
@@ -792,10 +770,23 @@ def api_mylist():
         result = remove_from_mylist(username, video_id)
         return jsonify({'success': result})
 
+@app.route('/api/mylist/add/<video_id>', methods=['POST'])
+@login_required
+def api_mylist_add(video_id):
+    username = session.get('username')
+    result = add_to_mylist(username, video_id)
+    return jsonify({'success': result})
+
+@app.route('/api/mylist/remove/<video_id>', methods=['DELETE'])
+@login_required
+def api_mylist_remove(video_id):
+    username = session.get('username')
+    result = remove_from_mylist(username, video_id)
+    return jsonify({'success': result})
+
 @app.route('/api/watch-history', methods=['GET'])
 @login_required
 def api_watch_history():
-    """Get user's watch history"""
     username = session.get('username')
     history = get_user_watch_history(username)
     return jsonify({'history': history})
@@ -803,7 +794,6 @@ def api_watch_history():
 @app.route('/api/upload', methods=['POST'])
 @login_required
 def api_upload():
-    """Upload movie - requires login"""
     username = session.get('username')
     users = load_users()
     
@@ -822,15 +812,12 @@ def api_upload():
     if not category:
         return jsonify({'error': 'Please select a category'}), 400
     
-    # Validate category
     if category not in [c['id'] for c in MOVIE_CATEGORIES]:
         return jsonify({'error': 'Invalid category'}), 400
     
-    # Save file temporarily
     temp_path = os.path.join(tempfile.gettempdir(), file.filename)
     file.save(temp_path)
     
-    # Upload to FTP
     remote_path = f'/movies/{category}/{file.filename}'
     success = upload_file_to_ftp(temp_path, remote_path)
     os.remove(temp_path)
@@ -838,11 +825,9 @@ def api_upload():
     if not success:
         return jsonify({'error': 'Upload failed. Check FTP server connection.'}), 500
     
-    # Save video info to database
     videos = load_videos()
     video_id = generate_video_id()
     
-    # Get file size
     file_size_bytes = os.path.getsize(temp_path)
     if file_size_bytes < 1024*1024:
         size_str = f"{file_size_bytes/1024:.1f} KB"
@@ -865,7 +850,6 @@ def api_upload():
     }
     save_videos(videos)
     
-    # Update user's video count
     update_user_total_views(username)
     
     return jsonify({'success': True, 'message': f'Movie "{file.filename}" uploaded successfully!', 'video_id': video_id})
@@ -873,7 +857,6 @@ def api_upload():
 @app.route('/api/admin/stats', methods=['GET'])
 @admin_required
 def api_admin_stats():
-    """Get admin dashboard statistics"""
     stats = get_video_stats()
     users = load_users()
     
@@ -897,7 +880,6 @@ def api_admin_stats():
 @app.route('/api/admin/delete-video/<video_id>', methods=['DELETE'])
 @admin_required
 def api_admin_delete_video(video_id):
-    """Delete a video (admin only)"""
     videos = load_videos()
     if video_id not in videos:
         return jsonify({'error': 'Video not found'}), 404
@@ -923,7 +905,6 @@ def api_admin_delete_video(video_id):
 @app.route('/api/admin/delete-user/<username>', methods=['DELETE'])
 @admin_required
 def api_admin_delete_user(username):
-    """Delete a user (admin only)"""
     if username == 'admin':
         return jsonify({'error': 'Cannot delete admin user'}), 403
     
@@ -945,7 +926,6 @@ def api_admin_delete_user(username):
 @app.route('/api/profile-pic', methods=['POST'])
 @login_required
 def api_upload_profile_pic():
-    """Upload profile picture"""
     username = session.get('username')
     if 'profile_pic' not in request.files:
         return jsonify({'error': 'No file selected'}), 400
@@ -986,7 +966,7 @@ def api_upload_profile_pic():
 
 @app.route('/admin', methods=['GET'])
 def admin_panel():
-    """Admin panel - only accessible via /admin URL"""
+    """Admin panel - ONLY accessible via /admin URL"""
     if 'username' not in session:
         return render_template('admin_login.html', theme=session.get('theme', 'dark'))
     
@@ -1005,7 +985,7 @@ def admin_panel():
 
 @app.route('/admin/login', methods=['POST'])
 def admin_login():
-    """Admin login form submission"""
+    """Admin login form submission - ONLY for /admin URL"""
     username = request.form.get('username', '').strip()
     password = request.form.get('password', '').strip()
     users = load_users()
@@ -1033,7 +1013,7 @@ def admin_logout():
 @app.route('/admin/upload', methods=['POST'])
 @admin_required
 def admin_upload():
-    """Admin upload route (for admin.html form)"""
+    """Admin upload route"""
     if 'movie_file' not in request.files:
         flash('No file selected', 'error')
         return redirect(url_for('admin_panel'))
@@ -1093,7 +1073,6 @@ def admin_upload():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    """User dashboard"""
     username = session.get('username')
     users = load_users()
     user_data = users.get(username, {})
@@ -1106,7 +1085,6 @@ def dashboard():
 
 @app.route('/profile/<username>')
 def profile_page(username):
-    """User profile page - view user's uploaded videos"""
     users = load_users()
     if username not in users:
         flash('User not found', 'error')
@@ -1131,7 +1109,6 @@ def profile_page(username):
 @app.route('/mylist')
 @login_required
 def mylist():
-    """My List (watch later) page"""
     username = session.get('username')
     mylist = get_user_mylist(username)
     return render_template('mylist.html',
@@ -1144,7 +1121,6 @@ def mylist():
 @app.route('/watch-history')
 @login_required
 def watch_history():
-    """Watch history page"""
     username = session.get('username')
     history = get_user_watch_history(username)
     return render_template('watch_history.html',
@@ -1156,28 +1132,12 @@ def watch_history():
 
 @app.route('/leaderboard')
 def leaderboard_page():
-    """Full leaderboard page"""
+    """Full leaderboard page - accessible to all but only shows meaningful data for logged-in users"""
     return render_template('leaderboard.html', 
                          categories=MOVIE_CATEGORIES,
                          logged_in='username' in session,
                          username=session.get('username', ''),
                          theme=session.get('theme', 'dark'))
-
-@app.route('/api/mylist/add/<video_id>', methods=['POST'])
-@login_required
-def api_mylist_add(video_id):
-    """Add video to My List"""
-    username = session.get('username')
-    result = add_to_mylist(username, video_id)
-    return jsonify({'success': result})
-
-@app.route('/api/mylist/remove/<video_id>', methods=['DELETE'])
-@login_required
-def api_mylist_remove(video_id):
-    """Remove video from My List"""
-    username = session.get('username')
-    result = remove_from_mylist(username, video_id)
-    return jsonify({'success': result})
 
 # ===== OTHER ROUTES =====
 
