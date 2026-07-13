@@ -25,14 +25,14 @@
         }
         
         [data-theme="light"] {
-            --bg-primary: #f5f5f5;
+            --bg-primary: #f0f0f0;
             --bg-secondary: #ffffff;
             --bg-card: #ffffff;
             --bg-hover: #e8e8e8;
-            --text-primary: #141414;
+            --text-primary: #1a1a1a;
             --text-secondary: #333333;
             --text-muted: #666666;
-            --border-color: #dddddd;
+            --border-color: #d0d0d0;
             --shadow: rgba(0,0,0,0.1);
         }
 
@@ -247,12 +247,16 @@
             font-weight: bold;
             font-size: 1.05rem;
             text-align: right;
+            transition: color 0.3s;
         }
         .lb-row .views .views-label {
             color: var(--text-muted);
             font-weight: normal;
             font-size: 0.7rem;
             display: block;
+        }
+        .lb-row .views.updating {
+            color: var(--success);
         }
         
         /* ===== EMPTY STATE ===== */
@@ -376,7 +380,7 @@
             <p>Top creators based on total video views</p>
             <div style="margin-top:10px;">
                 <span class="live-badge">● LIVE</span>
-                <span style="color: var(--text-muted); font-size:0.8rem; margin-left:10px;">Updates every second</span>
+                <span style="color: var(--text-muted); font-size:0.8rem; margin-left:10px;">Updates every 5 seconds</span>
             </div>
         </div>
 
@@ -413,6 +417,7 @@
         let currentFilter = 'all';
         let previousLeaderboard = [];
         let isUpdating = false;
+        let updateInterval = null;
 
         // ===== THEME TOGGLE =====
         function toggleTheme() {
@@ -446,7 +451,7 @@
                 .then(r => r.json())
                 .then(data => {
                     const leaderboard = data.leaderboard || [];
-                    renderLeaderboard(leaderboard);
+                    smoothUpdateLeaderboard(leaderboard);
                     document.getElementById('totalUsers').textContent = leaderboard.length;
                     isUpdating = false;
                 })
@@ -462,10 +467,12 @@
                 });
         }
 
-        // ===== RENDER LEADERBOARD =====
-        function renderLeaderboard(leaderboard) {
+        // ===== SMOOTH UPDATE LEADERBOARD (No Blinking) =====
+        function smoothUpdateLeaderboard(leaderboard) {
+            const container = document.getElementById('leaderboardRows');
+            
             if (leaderboard.length === 0) {
-                document.getElementById('leaderboardRows').innerHTML = `
+                container.innerHTML = `
                     <div class="empty-state">
                         <span class="icon">📭</span>
                         <h2>No users yet</h2>
@@ -476,10 +483,82 @@
                 return;
             }
 
-            let html = '';
+            // If first load or length changed significantly, do full render
+            if (previousLeaderboard.length === 0 || 
+                Math.abs(previousLeaderboard.length - leaderboard.length) > 2) {
+                renderFullLeaderboard(leaderboard);
+                previousLeaderboard = leaderboard;
+                return;
+            }
+
+            // Smooth update: update only view counts and ranks
+            const existingRows = container.querySelectorAll('.lb-row');
             const medals = ['🥇', '🥈', '🥉'];
             const rankClasses = ['gold', 'silver', 'bronze'];
 
+            // Update existing rows
+            leaderboard.forEach((user, index) => {
+                const row = container.querySelector(`.lb-row[data-username="${user.username}"]`);
+                if (row) {
+                    // Update rank
+                    const rankSpan = row.querySelector('.rank');
+                    if (rankSpan) {
+                        const medal = index < 3 ? medals[index] : `#${index + 1}`;
+                        const rankClass = index < 3 ? rankClasses[index] : '';
+                        rankSpan.className = `rank ${rankClass}`;
+                        rankSpan.innerHTML = index < 3 ? `<span class="medal">${medal}</span>` : medal;
+                    }
+                    
+                    // Update views with animation
+                    const viewsSpan = row.querySelector('.views');
+                    if (viewsSpan) {
+                        const currentText = viewsSpan.textContent.trim();
+                        const newText = user.total_views.toString();
+                        if (currentText !== newText) {
+                            viewsSpan.textContent = newText;
+                            // Highlight animation
+                            viewsSpan.classList.add('updating');
+                            setTimeout(() => {
+                                viewsSpan.classList.remove('updating');
+                            }, 500);
+                        }
+                    }
+                    
+                    // Update upload count
+                    const subText = row.querySelector('.sub-text');
+                    if (subText) {
+                        const uploadCount = user.total_uploads || 0;
+                        subText.textContent = `${uploadCount} uploads`;
+                    }
+                } else {
+                    // Row doesn't exist - rebuild
+                    renderFullLeaderboard(leaderboard);
+                    return;
+                }
+            });
+
+            // Check if any rows need to be removed (if users dropped out)
+            const usernames = leaderboard.map(u => u.username);
+            existingRows.forEach(row => {
+                const username = row.dataset.username;
+                if (!usernames.includes(username)) {
+                    row.style.transition = 'all 0.3s';
+                    row.style.opacity = '0';
+                    row.style.transform = 'scale(0.9)';
+                    setTimeout(() => row.remove(), 300);
+                }
+            });
+
+            previousLeaderboard = leaderboard;
+        }
+
+        // ===== RENDER FULL LEADERBOARD =====
+        function renderFullLeaderboard(leaderboard) {
+            const container = document.getElementById('leaderboardRows');
+            const medals = ['🥇', '🥈', '🥉'];
+            const rankClasses = ['gold', 'silver', 'bronze'];
+
+            let html = '';
             leaderboard.forEach((user, index) => {
                 const rankClass = index < 3 ? rankClasses[index] : '';
                 const medal = index < 3 ? medals[index] : `#${index + 1}`;
@@ -487,20 +566,10 @@
                     ? `<img src="${user.profile_pic}" alt="${user.username}">` 
                     : (user.username ? user.username[0].toUpperCase() : '?');
 
-                // Check if rank changed (for animation)
-                let rankChange = '';
-                if (previousLeaderboard.length > index) {
-                    const prevIndex = previousLeaderboard.findIndex(u => u.username === user.username);
-                    if (prevIndex !== -1 && prevIndex !== index) {
-                        rankChange = prevIndex < index ? '↓' : '↑';
-                    }
-                }
-
                 html += `
                     <div class="lb-row" data-username="${user.username}">
                         <span class="rank ${rankClass}">
                             ${index < 3 ? `<span class="medal">${medal}</span>` : medal}
-                            ${rankChange ? `<span style="font-size:0.7rem;color:${rankChange === '↑' ? 'var(--success)' : 'var(--accent)'};">${rankChange}</span>` : ''}
                         </span>
                         <div class="avatar">${avatarHtml}</div>
                         <div class="name">
@@ -515,29 +584,34 @@
                 `;
             });
 
-            document.getElementById('leaderboardRows').innerHTML = html;
+            container.innerHTML = html;
             previousLeaderboard = leaderboard;
         }
 
-        // ===== AUTO-REFRESH EVERY SECOND =====
-        let refreshInterval = setInterval(() => {
-            fetchLeaderboard(currentFilter);
-        }, 1000);
+        // ===== AUTO-REFRESH EVERY 5 SECONDS (Smooth) =====
+        function startAutoRefresh() {
+            if (updateInterval) clearInterval(updateInterval);
+            updateInterval = setInterval(() => {
+                fetchLeaderboard(currentFilter);
+            }, 5000);
+        }
 
         // ===== STOP REFRESH WHEN PAGE NOT VISIBLE =====
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
-                clearInterval(refreshInterval);
+                if (updateInterval) {
+                    clearInterval(updateInterval);
+                    updateInterval = null;
+                }
             } else {
-                refreshInterval = setInterval(() => {
-                    fetchLeaderboard(currentFilter);
-                }, 1000);
+                startAutoRefresh();
+                // Refresh immediately when tab becomes visible
+                fetchLeaderboard(currentFilter);
             }
         });
 
         // ===== KEYBOARD SHORTCUTS =====
         document.addEventListener('keydown', function(e) {
-            // 1 = All Time, 2 = Month, 3 = Week
             if (e.key === '1') {
                 document.querySelector('[data-filter="all"]')?.click();
             } else if (e.key === '2') {
@@ -545,9 +619,7 @@
             } else if (e.key === '3') {
                 document.querySelector('[data-filter="week"]')?.click();
             }
-            // R = Refresh
-            if (e.key === 'r' || e.key === 'R') {
-                if (e.ctrlKey || e.metaKey) return;
+            if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.metaKey) {
                 e.preventDefault();
                 fetchLeaderboard(currentFilter);
             }
@@ -555,10 +627,11 @@
 
         // ===== INIT =====
         fetchLeaderboard('all');
+        startAutoRefresh();
 
-        // Show keyboard shortcuts hint
         console.log('🎬 Keyboard Shortcuts:');
         console.log('  1 = All Time  2 = This Month  3 = This Week  R = Refresh');
+        console.log('📊 Leaderboard updates every 5 seconds (smooth, no blink)');
     </script>
 </body>
 </html>
