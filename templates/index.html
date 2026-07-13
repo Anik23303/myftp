@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎬 Movie FTP </title>
+    <title>🎬 Movie FTP - Netflix Style</title>
     <style>
         /* ===== RESET & BASE ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -884,7 +884,6 @@
             <li><a href="/" class="active">Home</a></li>
             <li><a href="#rows">Movies</a></li>
             <li><a href="#adult-row">Adult 18+</a></li>
-            <!-- Leaderboard link REMOVED from top navbar -->
         </ul>
         <div class="nav-right">
             {% if logged_in %}
@@ -921,7 +920,7 @@
             <h2>🔥 Trending Now</h2>
             <div class="row-scroll">
                 {% for movie in trending %}
-                <div class="movie-card" onclick="window.location.href='/stream/{{ movie.category }}/{{ movie.filename }}'">
+                <div class="movie-card" onclick="window.location.href='/watch/{{ movie.id }}'">
                     <div class="poster" style="background: {{ movie.get('thumbnail_color', '#2a2a3e') }};">
                         {{ movie.get('poster', '🎬') }}
                         <span class="trending-tag">🔥 Trending</span>
@@ -937,7 +936,8 @@
                         </div>
                     </div>
                     <div class="hover-actions">
-                        <a href="/stream/{{ movie.category }}/{{ movie.filename }}" class="btn-stream-sm">▶ Stream</a>
+                        <!-- UPDATED: Links to /watch/ instead of /stream/ -->
+                        <a href="/watch/{{ movie.id }}" class="btn-stream-sm">▶ Stream</a>
                         <a href="/download/{{ movie.category }}/{{ movie.filename }}" class="btn-download-sm">⬇ Download</a>
                         {% if logged_in %}
                         <button class="btn-mylist-sm" onclick="event.stopPropagation(); addToMyList('{{ movie.id }}')">📋</button>
@@ -960,7 +960,7 @@
                 <div class="row-scroll">
                     {% set movies = get_movie_listing(cat.id) %}
                     {% for movie in movies[:10] %}
-                    <div class="movie-card" onclick="window.location.href='/stream/{{ cat.id }}/{{ movie.filename }}'">
+                    <div class="movie-card" onclick="window.location.href='/watch/{{ movie.id }}'">
                         <div class="poster" style="background: {{ movie.get('thumbnail_color', '#2a2a3e') }};">
                             {{ movie.get('poster', '🎬') }}
                             {% if movie.rating %}
@@ -975,7 +975,8 @@
                             </div>
                         </div>
                         <div class="hover-actions">
-                            <a href="/stream/{{ cat.id }}/{{ movie.filename }}" class="btn-stream-sm">▶ Stream</a>
+                            <!-- UPDATED: Links to /watch/ instead of /stream/ -->
+                            <a href="/watch/{{ movie.id }}" class="btn-stream-sm">▶ Stream</a>
                             <a href="/download/{{ cat.id }}/{{ movie.filename }}" class="btn-download-sm">⬇ Download</a>
                             {% if logged_in %}
                             <button class="btn-mylist-sm" onclick="event.stopPropagation(); addToMyList('{{ movie.id }}')">📋</button>
@@ -997,7 +998,7 @@
             <div class="row-scroll">
                 {% set adult_movies = get_movie_listing('adult') %}
                 {% for movie in adult_movies[:10] %}
-                <div class="movie-card" onclick="window.location.href='/stream/adult/{{ movie.filename }}'">
+                <div class="movie-card" onclick="window.location.href='/watch/{{ movie.id }}'">
                     <div class="poster" style="background: {{ movie.get('thumbnail_color', '#2a0a0a') }};">
                         🔞
                         <span class="rating" style="background:var(--accent);">18+</span>
@@ -1010,7 +1011,8 @@
                         </div>
                     </div>
                     <div class="hover-actions">
-                        <a href="/watch/{{ movie.id }}" class="btn-stream">▶ Stream</a>
+                        <!-- UPDATED: Links to /watch/ instead of /stream/ -->
+                        <a href="/watch/{{ movie.id }}" class="btn-stream-sm">▶ Stream</a>
                         <a href="/download/adult/{{ movie.filename }}" class="btn-download-sm">⬇ Download</a>
                     </div>
                 </div>
