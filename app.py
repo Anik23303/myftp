@@ -1149,6 +1149,22 @@ def health():
         'users': len(load_users()),
         'videos': len(load_videos())
     })
+    @app.route('/watch/<video_id>')
+def watch_movie(video_id):
+    """Watch movie page with embedded video"""
+    videos = load_videos()
+    if video_id not in videos:
+        abort(404)
+    
+    movie = videos[video_id]
+    # Increment views
+    movie['views'] = movie.get('views', 0) + 1
+    save_videos(videos)
+    
+    return render_template('embed.html', 
+                         movie=movie,
+                         logged_in='username' in session,
+                         theme=session.get('theme', 'dark'))
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
