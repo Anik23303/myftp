@@ -258,14 +258,14 @@
             {% endif %}
         {% endwith %}
         
-        <form method="POST" action="/admin/login">
+        <form method="POST" action="/admin/login" id="adminLoginForm">
             <div class="form-group">
                 <label>Username <span class="required">*</span></label>
-                <input type="text" name="username" placeholder="Enter admin username" required autocomplete="username">
+                <input type="text" name="username" placeholder="Enter admin username" required autocomplete="username" id="adminUsername">
             </div>
             <div class="form-group">
                 <label>Password <span class="required">*</span></label>
-                <input type="password" name="password" placeholder="Enter admin password" required autocomplete="current-password">
+                <input type="password" name="password" placeholder="Enter admin password" required autocomplete="current-password" id="adminPassword">
             </div>
             
             <button type="submit" class="btn-submit" id="loginBtn">
@@ -289,19 +289,27 @@
                 .then(() => location.reload());
         }
 
-        document.getElementById('loginBtn').addEventListener('click', function(e) {
-            this.innerHTML = '⏳ Logging in...';
-            this.disabled = true;
+        // ===== FORM HANDLING - Proper Submit =====
+        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
+            // Show loading state
+            const btn = document.getElementById('loginBtn');
+            btn.innerHTML = '⏳ Logging in...';
+            btn.disabled = true;
+            
+            // The form will submit normally to /admin/login
+            // No need to prevent default
         });
 
+        // ===== KEYBOARD SHORTCUTS =====
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 window.location.href = '/';
             }
         });
 
+        // ===== AUTO-FOCUS =====
         document.addEventListener('DOMContentLoaded', function() {
-            document.querySelector('input[name="username"]').focus();
+            document.getElementById('adminUsername').focus();
         });
     </script>
 </body>
