@@ -827,6 +827,7 @@
             <a href="/dashboard" class="dashboard-btn" onclick="toggleSidebar()">📊 Dashboard</a>
             <a href="/mylist" class="dashboard-btn" onclick="toggleSidebar()">📋 My List</a>
             <a href="/watch-history" class="dashboard-btn" onclick="toggleSidebar()">📜 Watch History</a>
+            <a href="/leaderboard" class="dashboard-btn" onclick="toggleSidebar()">🏆 Leaderboard</a>
             <button class="logout-btn" onclick="handleLogout()">🚪 Logout</button>
         {% else %}
             <a href="/register" class="dashboard-btn" style="background: var(--accent); color: white; border: none; font-weight: bold;" onclick="toggleSidebar()">
@@ -883,7 +884,7 @@
             <li><a href="/" class="active">Home</a></li>
             <li><a href="#rows">Movies</a></li>
             <li><a href="#adult-row">Adult 18+</a></li>
-            <li><a href="/leaderboard">🏆 Leaderboard</a></li>
+            <!-- Leaderboard link REMOVED from top navbar -->
         </ul>
         <div class="nav-right">
             {% if logged_in %}
