@@ -33,14 +33,14 @@
         }
         
         [data-theme="light"] {
-            --bg-primary: #f5f5f5;
+            --bg-primary: #f0f0f0;
             --bg-secondary: #ffffff;
             --bg-card: #ffffff;
             --bg-hover: #e8e8e8;
-            --text-primary: #141414;
+            --text-primary: #1a1a1a;
             --text-secondary: #333333;
             --text-muted: #666666;
-            --border-color: #dddddd;
+            --border-color: #d0d0d0;
             --shadow: rgba(0,0,0,0.1);
         }
         
@@ -59,12 +59,11 @@
             z-index: 1000;
             padding: 10px 40px;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             background: linear-gradient(to bottom, rgba(20,20,20,0.95) 0%, transparent 100%);
             transition: background 0.3s;
-            flex-wrap: wrap;
-            gap: 10px;
+            gap: 20px;
         }
         [data-theme="light"] .navbar {
             background: linear-gradient(to bottom, rgba(255,255,255,0.95) 0%, transparent 100%);
@@ -72,11 +71,6 @@
         .navbar.scrolled {
             background: var(--bg-primary);
             border-bottom: 1px solid var(--border-color);
-        }
-        .navbar .brand {
-            display: flex;
-            align-items: center;
-            gap: 20px;
         }
         .navbar .brand a {
             color: var(--accent);
@@ -104,20 +98,6 @@
             align-items: center;
             gap: 15px;
         }
-        .navbar .nav-right .theme-toggle {
-            background: none;
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            padding: 6px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-        }
-        .navbar .nav-right .theme-toggle:hover {
-            border-color: var(--accent);
-            color: var(--text-primary);
-        }
         .navbar .nav-right .user-badge {
             color: var(--success);
             font-size: 0.85rem;
@@ -134,15 +114,21 @@
             font-weight: bold;
             margin-right: 8px;
             vertical-align: middle;
+            overflow: hidden;
+        }
+        .navbar .nav-right .user-badge .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        /* ===== SIDEBAR TOGGLE (Top Left) ===== */
+        /* ===== SIDEBAR TOGGLE (Top Left - Fixed Position) ===== */
         .sidebar-toggle {
             position: fixed;
-            top: 15px;
-            left: 15px;
+            top: 12px;
+            left: 12px;
             z-index: 1002;
-            background: rgba(20,20,20,0.8);
+            background: rgba(20,20,20,0.85);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 8px 10px;
@@ -150,7 +136,7 @@
             transition: all 0.3s;
         }
         [data-theme="light"] .sidebar-toggle {
-            background: rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.85);
         }
         .sidebar-toggle:hover {
             background: var(--accent);
@@ -168,10 +154,10 @@
         /* ===== SIDEBAR ===== */
         .sidebar {
             position: fixed;
-            left: -300px;
+            left: -320px;
             top: 0;
             bottom: 0;
-            width: 280px;
+            width: 300px;
             z-index: 1001;
             background: var(--bg-primary);
             border-right: 1px solid var(--border-color);
@@ -317,6 +303,30 @@
             border-color: var(--accent);
             color: var(--accent);
         }
+        
+        /* ===== THEME TOGGLE IN SIDEBAR ===== */
+        .sidebar .theme-toggle-sidebar {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .sidebar .theme-toggle-sidebar:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+        
+        /* ===== LEADERBOARD IN SIDEBAR (Logged-in only) ===== */
         .sidebar .leaderboard-preview {
             margin-top: 20px;
             padding: 15px;
@@ -335,6 +345,7 @@
             gap: 10px;
             padding: 5px 0;
             font-size: 0.85rem;
+            transition: all 0.3s;
         }
         .sidebar .leaderboard-preview .lb-item .rank {
             color: var(--text-muted);
@@ -363,6 +374,7 @@
         .sidebar .leaderboard-preview .lb-item .lb-views {
             color: var(--text-muted);
             font-size: 0.8rem;
+            transition: all 0.3s;
         }
         .sidebar .view-all-link {
             display: block;
@@ -401,6 +413,11 @@
             border-bottom: 3px solid var(--accent);
             position: relative;
         }
+        [data-theme="light"] .hero {
+            background: linear-gradient(to right, rgba(255,255,255,0.9) 30%, transparent),
+                        linear-gradient(to bottom, transparent, var(--bg-primary)),
+                        var(--bg-secondary);
+        }
         .hero h1 {
             font-size: 3rem;
             max-width: 600px;
@@ -425,19 +442,6 @@
         }
         .hero .btn-play:hover {
             transform: scale(1.05);
-        }
-        .hero .stats-badge {
-            display: inline-block;
-            background: rgba(0,0,0,0.6);
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-top: 15px;
-        }
-        .hero .stats-badge span {
-            color: var(--text-primary);
-            font-weight: bold;
         }
         .hero .trending-badge {
             display: inline-block;
@@ -534,16 +538,6 @@
             font-size: 0.7rem;
             font-weight: bold;
         }
-        .movie-card .poster .mylist-tag {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.8);
-            color: var(--gold);
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-        }
         .movie-card .info {
             padding: 12px;
         }
@@ -605,35 +599,6 @@
         }
         .row.adult-row .movie-card .poster {
             background: #2a0a0a;
-        }
-
-        /* ===== LOADING SKELETON ===== */
-        .skeleton {
-            flex: 0 0 200px;
-            border-radius: 8px;
-            overflow: hidden;
-            background: var(--bg-hover);
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-        .skeleton .skeleton-poster {
-            height: 280px;
-            background: var(--bg-hover);
-            opacity: 0.3;
-        }
-        .skeleton .skeleton-text {
-            height: 20px;
-            margin: 10px;
-            background: var(--bg-hover);
-            opacity: 0.3;
-            border-radius: 4px;
-        }
-        .skeleton .skeleton-text.short {
-            width: 60%;
-        }
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
         }
 
         /* ===== MODAL ===== */
@@ -800,26 +765,22 @@
             .row { padding: 15px 20px; }
             .movie-card { flex: 0 0 150px; }
             .movie-card .poster { height: 200px; font-size: 3rem; }
-            .sidebar { width: 250px; left: -260px; }
+            .sidebar { width: 280px; left: -290px; }
             .sidebar-toggle { top: 12px; left: 12px; }
             .modal-content { padding: 25px; }
-            .skeleton { flex: 0 0 150px; }
-            .skeleton .skeleton-poster { height: 200px; }
         }
         @media (max-width: 480px) {
             .movie-card { flex: 0 0 130px; }
             .movie-card .poster { height: 170px; font-size: 2.5rem; }
             .hero h1 { font-size: 1.5rem; }
-            .sidebar { width: 220px; left: -230px; padding: 60px 15px 15px; }
-            .skeleton { flex: 0 0 130px; }
-            .skeleton .skeleton-poster { height: 170px; }
+            .sidebar { width: 260px; left: -270px; padding: 60px 15px 15px; }
         }
     </style>
 </head>
 <body data-theme="{{ theme }}">
 
-    <!-- ===== SIDEBAR TOGGLE (Top Left) ===== -->
-    <div class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">
+    <!-- ===== SIDEBAR TOGGLE (Top Left - Fixed Position) ===== -->
+    <div class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar" aria-label="Toggle Sidebar">
         <span class="bar"></span>
         <span class="bar"></span>
         <span class="bar"></span>
@@ -873,29 +834,37 @@
             </a>
         {% endif %}
         
-        <!-- Leaderboard Preview -->
-        <div class="leaderboard-preview">
+        <!-- ===== THEME TOGGLE INSIDE SIDEBAR ===== -->
+        <button class="theme-toggle-sidebar" onclick="toggleTheme()">
+            {% if theme == 'dark' %}☀️ Light Mode{% else %}🌙 Dark Mode{% endif %}
+        </button>
+        
+        <!-- ===== LEADERBOARD PREVIEW (Logged-in Only) ===== -->
+        {% if logged_in %}
+        <div class="leaderboard-preview" id="sidebarLeaderboard">
             <h4>🏆 Leaderboard</h4>
-            {% for user in leaderboard[:5] %}
-            <div class="lb-item">
-                <span class="rank">#{{ loop.index }}</span>
-                <span class="lb-avatar">
-                    {% if user.profile_pic %}
-                        <img src="{{ user.profile_pic }}" alt="{{ user.username }}">
-                    {% else %}
-                        {{ user.username[0].upper() if user.username else '?' }}
-                    {% endif %}
-                </span>
-                <span class="lb-name">{{ user.username }}</span>
-                <span class="lb-views">{{ user.total_views }} views</span>
+            <div id="sidebarLeaderboardList">
+                {% for user in leaderboard[:5] %}
+                <div class="lb-item" data-username="{{ user.username }}">
+                    <span class="rank">#{{ loop.index }}</span>
+                    <span class="lb-avatar">
+                        {% if user.profile_pic %}
+                            <img src="{{ user.profile_pic }}" alt="{{ user.username }}">
+                        {% else %}
+                            {{ user.username[0].upper() if user.username else '?' }}
+                        {% endif %}
+                    </span>
+                    <span class="lb-name">{{ user.username }}</span>
+                    <span class="lb-views">{{ user.total_views }} views</span>
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
             <a href="/leaderboard" class="view-all-link">View Full Leaderboard →</a>
         </div>
+        {% endif %}
         
         <p style="color: var(--text-muted); font-size: 0.7rem; text-align: center; margin-top: 20px;">
-            🎬 Movie FTP Server<br>
-            {{ user_count }} Users • {{ categories|length }} Categories
+            🎬 Movie FTP Server
         </p>
     </div>
 
@@ -917,9 +886,6 @@
             <li><a href="/leaderboard">🏆 Leaderboard</a></li>
         </ul>
         <div class="nav-right">
-            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
-                {% if theme == 'dark' %}☀️ Light{% else %}🌙 Dark{% endif %}
-            </button>
             {% if logged_in %}
                 <span class="user-badge">
                     <span class="avatar">
@@ -935,7 +901,7 @@
         </div>
     </nav>
 
-    <!-- ===== HERO BANNER ===== -->
+    <!-- ===== HERO BANNER (Stats Removed) ===== -->
     <section class="hero">
         <div class="trending-badge">🔥 Trending Now</div>
         <h1>🎬 Movie FTP</h1>
@@ -943,9 +909,6 @@
         <button class="btn-play" onclick="document.getElementById('rows').scrollIntoView({behavior:'smooth'})">
             ▶ Browse Movies
         </button>
-        <div class="stats-badge">
-            📊 <span>{{ user_count }}</span> Users • <span>{{ categories|length }}</span> Categories • <span>{{ leaderboard|length if leaderboard else 0 }}</span> Top Creators
-        </div>
     </section>
 
     <!-- ===== MOVIE ROWS ===== -->
@@ -975,7 +938,9 @@
                     <div class="hover-actions">
                         <a href="/stream/{{ movie.category }}/{{ movie.filename }}" class="btn-stream-sm">▶ Stream</a>
                         <a href="/download/{{ movie.category }}/{{ movie.filename }}" class="btn-download-sm">⬇ Download</a>
+                        {% if logged_in %}
                         <button class="btn-mylist-sm" onclick="event.stopPropagation(); addToMyList('{{ movie.id }}')">📋</button>
+                        {% endif %}
                     </div>
                 </div>
                 {% endfor %}
@@ -1011,7 +976,9 @@
                         <div class="hover-actions">
                             <a href="/stream/{{ cat.id }}/{{ movie.filename }}" class="btn-stream-sm">▶ Stream</a>
                             <a href="/download/{{ cat.id }}/{{ movie.filename }}" class="btn-download-sm">⬇ Download</a>
+                            {% if logged_in %}
                             <button class="btn-mylist-sm" onclick="event.stopPropagation(); addToMyList('{{ movie.id }}')">📋</button>
+                            {% endif %}
                         </div>
                     </div>
                     {% endfor %}
@@ -1313,6 +1280,59 @@
                     });
             }
         }
+
+        // ===== SIDEBAR LEADERBOARD SMOOTH UPDATE (Logged-in Only) =====
+        {% if logged_in %}
+        function updateSidebarLeaderboard() {
+            fetch('/api/leaderboard?filter=all')
+                .then(r => r.json())
+                .then(data => {
+                    const leaderboard = data.leaderboard || [];
+                    const container = document.getElementById('sidebarLeaderboardList');
+                    if (!container) return;
+                    
+                    // Get existing items
+                    const existingItems = container.querySelectorAll('.lb-item');
+                    const existingData = [];
+                    existingItems.forEach(item => {
+                        const username = item.dataset.username;
+                        const viewsSpan = item.querySelector('.lb-views');
+                        if (username && viewsSpan) {
+                            existingData.push({
+                                username: username,
+                                viewsElement: viewsSpan
+                            });
+                        }
+                    });
+                    
+                    // Update views without re-rendering
+                    leaderboard.slice(0, 5).forEach((user, index) => {
+                        const existing = existingData.find(e => e.username === user.username);
+                        if (existing) {
+                            // Only update if view count changed
+                            const currentText = existing.viewsElement.textContent;
+                            const newText = `${user.total_views} views`;
+                            if (currentText !== newText) {
+                                existing.viewsElement.textContent = newText;
+                                // Highlight animation
+                                existing.viewsElement.style.transition = 'color 0.3s';
+                                existing.viewsElement.style.color = 'var(--gold)';
+                                setTimeout(() => {
+                                    existing.viewsElement.style.color = '';
+                                }, 500);
+                            }
+                        } else {
+                            // Item not found - full refresh needed
+                            location.reload();
+                        }
+                    });
+                })
+                .catch(() => {});
+        }
+        
+        // Update sidebar leaderboard every 5 seconds (smooth, no blink)
+        setInterval(updateSidebarLeaderboard, 5000);
+        {% endif %}
 
         // ===== CLOSE MODAL ON ESCAPE =====
         document.addEventListener('keydown', function(e) {
