@@ -498,8 +498,10 @@ def category_movies(category_id):
     if not category:
         abort(404)
     movies = get_movie_listing(category_id)
-    return render_template('category.html', 
-                         category=category,
+    return render_template('movies.html', 
+                         category=category_id,
+                         category_name=category['name'],
+                         category_icon=category['icon'],
                          movies=movies,
                          categories=MOVIE_CATEGORIES,
                          logged_in='username' in session,
@@ -1139,17 +1141,11 @@ def leaderboard_page():
                          username=session.get('username', ''),
                          theme=session.get('theme', 'dark'))
 
-# ===== OTHER ROUTES =====
+# ============================================================
+# WATCH MOVIE ROUTE - EXTERNAL VIDEO EMBED (NEW)
+# ============================================================
 
-@app.route('/health')
-def health():
-    return jsonify({
-        'status': 'healthy',
-        'timestamp': datetime.now().isoformat(),
-        'users': len(load_users()),
-        'videos': len(load_videos())
-    })
-    @app.route('/watch/<video_id>')
+@app.route('/watch/<video_id>')
 def watch_movie(video_id):
     """Watch movie page with embedded video"""
     videos = load_videos()
@@ -1165,6 +1161,23 @@ def watch_movie(video_id):
                          movie=movie,
                          logged_in='username' in session,
                          theme=session.get('theme', 'dark'))
+
+# ============================================================
+# OTHER ROUTES
+# ============================================================
+
+@app.route('/health')
+def health():
+    return jsonify({
+        'status': 'healthy',
+        'timestamp': datetime.now().isoformat(),
+        'users': len(load_users()),
+        'videos': len(load_videos())
+    })
+
+# ============================================================
+# SERVER START
+# ============================================================
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
