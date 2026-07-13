@@ -12,10 +12,41 @@
             color: #fff;
             min-height: 100vh;
         }
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 10px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #141414;
+            border-bottom: 1px solid #333;
+        }
+        .navbar .brand a {
+            color: #e50914;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .navbar .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .navbar .nav-right a {
+            color: #e5e5e5;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .navbar .nav-right a:hover { color: #fff; }
+        
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 80px 20px 20px;
         }
         .video-wrapper {
             position: relative;
@@ -57,13 +88,52 @@
             padding: 4px 12px;
             border-radius: 4px;
         }
+        .movie-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .movie-actions a {
+            padding: 10px 25px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-download {
+            background: #2a2a3e;
+            color: #ddd;
+        }
+        .btn-download:hover { background: #3a3a5e; }
+        .btn-back {
+            background: transparent;
+            color: #888;
+            border: 1px solid #444;
+        }
+        .btn-back:hover { border-color: #e50914; color: #e50914; }
+        
         @media (max-width: 768px) {
-            .container { padding: 10px; }
+            .container { padding: 70px 10px 10px; }
             .movie-info h1 { font-size: 1.5rem; }
+            .navbar { padding: 10px 15px; }
+            .movie-actions { flex-direction: column; }
+            .movie-actions a { text-align: center; }
         }
     </style>
 </head>
 <body>
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <div class="brand"><a href="/">🎬 Movie FTP</a></div>
+        <div class="nav-right">
+            <a href="/">Home</a>
+            {% if logged_in %}
+                <a href="/dashboard">Dashboard</a>
+                <a href="/logout">Logout</a>
+            {% endif %}
+        </div>
+    </nav>
+
     <div class="container">
         <a href="/category/{{ movie.category }}" class="back-link">← Back to {{ movie.category }}</a>
         
@@ -74,12 +144,27 @@
         <div class="movie-info">
             <h1>{{ movie.title }}</h1>
             <div class="meta">
+                {% if movie.rating %}
                 <span>⭐ {{ movie.rating }}</span>
+                {% endif %}
+                {% if movie.year %}
                 <span>📅 {{ movie.year }}</span>
+                {% endif %}
+                {% if movie.language %}
                 <span>🌐 {{ movie.language }}</span>
+                {% endif %}
+                {% if movie.genre %}
                 <span>🎭 {{ movie.genre }}</span>
+                {% endif %}
                 <span>👁️ {{ movie.views }} views</span>
             </div>
+        </div>
+        
+        <div class="movie-actions">
+            {% if movie.download_url %}
+            <a href="{{ movie.download_url }}" target="_blank" class="btn-download">⬇ Download</a>
+            {% endif %}
+            <a href="/category/{{ movie.category }}" class="btn-back">📂 Browse {{ movie.category }}</a>
         </div>
     </div>
 </body>
