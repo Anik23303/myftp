@@ -45,7 +45,6 @@
             transition: background 0.3s, color 0.3s;
         }
         
-        /* ===== LOGIN CONTAINER ===== */
         .login-container {
             background: var(--bg-secondary);
             padding: 45px 40px;
@@ -76,7 +75,6 @@
             margin-bottom: 15px;
             display: block;
         }
-        
         .login-container h2 {
             color: var(--text-secondary);
             text-align: center;
@@ -90,7 +88,6 @@
             font-size: 0.9rem;
         }
         
-        /* ===== FORM ===== */
         .form-group {
             margin-bottom: 18px;
         }
@@ -123,7 +120,6 @@
             color: var(--text-muted);
         }
         
-        /* ===== BUTTONS ===== */
         .btn-submit {
             width: 100%;
             padding: 13px;
@@ -147,7 +143,6 @@
             margin-right: 8px;
         }
         
-        /* ===== FLASH MESSAGES ===== */
         .flash {
             padding: 12px 15px;
             border-radius: 6px;
@@ -165,7 +160,6 @@
             border: 1px solid #ff4444;
         }
         
-        /* ===== LINKS ===== */
         .links {
             text-align: center;
             margin-top: 20px;
@@ -186,7 +180,6 @@
             margin-top: 10px;
         }
         
-        /* ===== THEME TOGGLE ===== */
         .theme-toggle-wrapper {
             position: fixed;
             top: 20px;
@@ -208,7 +201,6 @@
             color: var(--text-primary);
         }
         
-        /* ===== SECURITY BADGE ===== */
         .security-badge {
             display: flex;
             align-items: center;
@@ -232,7 +224,6 @@
             100% { opacity: 1; }
         }
         
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
             .login-container { padding: 30px 20px; }
             .login-container .logo h1 { font-size: 1.5rem; }
@@ -243,14 +234,12 @@
 </head>
 <body data-theme="{{ theme }}">
 
-    <!-- ===== THEME TOGGLE ===== -->
     <div class="theme-toggle-wrapper">
         <button onclick="toggleTheme()">
             {% if theme == 'dark' %}☀️ Light{% else %}🌙 Dark{% endif %}
         </button>
     </div>
 
-    <!-- ===== LOGIN CONTAINER ===== -->
     <div class="login-container">
         <div class="logo">
             <h1>🎬 Movie FTP</h1>
@@ -261,7 +250,6 @@
         <h2>Admin Login</h2>
         <p class="desc">Enter your credentials to access the admin dashboard</p>
         
-        <!-- ===== FLASH MESSAGES ===== -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -270,8 +258,7 @@
             {% endif %}
         {% endwith %}
         
-        <!-- ===== LOGIN FORM ===== -->
-        <form method="POST" action="/admin/login" id="loginForm">
+        <form method="POST" action="/admin/login">
             <div class="form-group">
                 <label>Username <span class="required">*</span></label>
                 <input type="text" name="username" placeholder="Enter admin username" required autocomplete="username">
@@ -297,62 +284,25 @@
     </div>
 
     <script>
-        // ===== THEME TOGGLE =====
         function toggleTheme() {
             fetch('/toggle-theme')
                 .then(() => location.reload());
         }
 
-        // ===== LOGIN FORM HANDLING =====
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            const btn = document.getElementById('loginBtn');
-            btn.innerHTML = '⏳ Logging in...';
-            btn.disabled = true;
-            // Form will submit normally, button text will reset on page load
+        document.getElementById('loginBtn').addEventListener('click', function(e) {
+            this.innerHTML = '⏳ Logging in...';
+            this.disabled = true;
         });
 
-        // ===== KEYBOARD SHORTCUTS =====
         document.addEventListener('keydown', function(e) {
-            // Enter key on form submits automatically
-            // Escape key clears form
             if (e.key === 'Escape') {
-                document.querySelector('input[name="username"]').value = '';
-                document.querySelector('input[name="password"]').value = '';
+                window.location.href = '/';
             }
         });
 
-        // ===== AUTO-FOCUS ON USERNAME FIELD =====
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('input[name="username"]').focus();
         });
-
-        // ===== SHOW/HIDE PASSWORD (Optional) =====
-        // Uncomment below if you want show/hide password toggle
-        /*
-        const passwordInput = document.querySelector('input[name="password"]');
-        const toggleBtn = document.createElement('button');
-        toggleBtn.type = 'button';
-        toggleBtn.textContent = '👁️';
-        toggleBtn.style.cssText = `
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 5px;
-        `;
-        passwordInput.parentElement.style.position = 'relative';
-        passwordInput.parentElement.appendChild(toggleBtn);
-        
-        toggleBtn.addEventListener('click', function() {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.textContent = type === 'password' ? '👁️' : '🙈';
-        });
-        */
     </script>
 </body>
 </html>
