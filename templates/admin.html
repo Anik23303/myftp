@@ -197,14 +197,6 @@
             color: var(--text-secondary);
             margin-bottom: 15px;
         }
-        .video-list-section h3 .badge {
-            background: var(--accent);
-            color: white;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            margin-left: 10px;
-        }
         
         /* ===== TABLES ===== */
         .table-wrapper {
@@ -229,15 +221,6 @@
         .data-table tr:hover td {
             background: var(--bg-hover);
         }
-        .data-table .video-title {
-            font-weight: bold;
-        }
-        .data-table .views-badge {
-            background: var(--bg-hover);
-            padding: 2px 12px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-        }
         .data-table .delete-btn {
             background: #ff4444;
             color: white;
@@ -261,14 +244,6 @@
         .upload-section h3 {
             color: var(--text-secondary);
             margin-bottom: 15px;
-        }
-        .upload-section h3 .badge {
-            background: var(--success);
-            color: #141414;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            margin-left: 10px;
         }
         .upload-form {
             display: grid;
@@ -312,25 +287,6 @@
         .upload-form .btn-upload:hover {
             background: var(--accent-hover);
         }
-        .upload-form .progress-container {
-            width: 100%;
-            height: 6px;
-            background: var(--bg-hover);
-            border-radius: 3px;
-            overflow: hidden;
-            margin-top: 10px;
-            display: none;
-        }
-        .upload-form .progress-container.active {
-            display: block;
-        }
-        .upload-form .progress-container .progress-fill {
-            height: 100%;
-            background: var(--accent);
-            width: 0%;
-            transition: width 0.3s;
-            border-radius: 3px;
-        }
         
         /* ===== USER LIST ===== */
         .user-list-section {
@@ -344,27 +300,6 @@
         .user-list-section h3 {
             color: var(--text-secondary);
             margin-bottom: 15px;
-        }
-        .user-list-section .user-count {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-left: 10px;
-        }
-        .user-table .user-avatar {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: var(--bg-hover);
-            text-align: center;
-            line-height: 30px;
-            font-weight: bold;
-            display: inline-block;
-            overflow: hidden;
-        }
-        .user-table .user-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
         }
         .user-table .role-badge {
             padding: 2px 10px;
@@ -392,39 +327,6 @@
         }
         .user-table .delete-btn:hover { background: #cc0000; }
         
-        /* ===== SEARCH/FILTER ===== */
-        .filter-bar {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-bottom: 15px;
-            align-items: center;
-        }
-        .filter-bar input, .filter-bar select {
-            padding: 8px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background: var(--bg-hover);
-            color: var(--text-primary);
-            font-size: 0.9rem;
-        }
-        .filter-bar input:focus, .filter-bar select:focus {
-            outline: 2px solid var(--accent);
-        }
-        .filter-bar .clear-btn {
-            background: var(--bg-hover);
-            color: var(--text-secondary);
-            border: 1px solid var(--border-color);
-            padding: 6px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .filter-bar .clear-btn:hover {
-            border-color: var(--accent);
-            color: var(--text-primary);
-        }
-        
         /* ===== FLASH MESSAGES ===== */
         .flash {
             padding: 10px 15px;
@@ -442,6 +344,34 @@
             border: 1px solid #ff4444;
         }
         
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            padding: 12px 20px;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            box-shadow: 0 10px 30px var(--shadow);
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid var(--success);
+            max-width: 350px;
+        }
+        .toast.error { border-left-color: var(--accent); }
+        .toast.info { border-left-color: var(--gold); }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .charts-grid { grid-template-columns: 1fr; }
@@ -449,9 +379,6 @@
             .container { padding: 70px 15px 20px; }
             .navbar { padding: 10px 15px; }
             .stats-grid { grid-template-columns: 1fr 1fr; }
-            .dashboard-header h1 { font-size: 1.5rem; }
-            .filter-bar { flex-direction: column; }
-            .filter-bar input, .filter-bar select { width: 100%; }
         }
         @media (max-width: 480px) {
             .stats-grid { grid-template-columns: 1fr; }
@@ -481,9 +408,7 @@
                 <p>Manage users, videos, and view analytics</p>
             </div>
             <div class="last-updated">
-                Last updated: <span id="lastUpdated">{{ now if now else datetime.now().strftime('%Y-%m-%d %H:%M:%S') }}</span>
-                <br>
-                <button onclick="refreshData()" style="background: var(--accent); color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; margin-top: 5px;">🔄 Refresh</button>
+                Last updated: <span id="lastUpdated">{{ datetime.now().strftime('%Y-%m-%d %H:%M:%S') if datetime else 'Now' }}</span>
             </div>
         </div>
 
@@ -497,25 +422,25 @@
         {% endwith %}
 
         <!-- ===== STATS CARDS ===== -->
-        <div class="stats-grid" id="statsGrid">
+        <div class="stats-grid">
             <div class="stat-card">
                 <span class="icon">🎬</span>
-                <div class="number" id="totalVideos">{{ stats.total_videos }}</div>
+                <div class="number" id="totalVideos">{{ stats.total_videos if stats else 0 }}</div>
                 <div class="label">Total Videos</div>
             </div>
             <div class="stat-card">
                 <span class="icon">👁️</span>
-                <div class="number" id="totalViews">{{ stats.total_views }}</div>
+                <div class="number" id="totalViews">{{ stats.total_views if stats else 0 }}</div>
                 <div class="label">Total Views</div>
             </div>
             <div class="stat-card">
                 <span class="icon">👥</span>
-                <div class="number" id="totalUsers">{{ stats.total_users }}</div>
+                <div class="number" id="totalUsers">{{ stats.total_users if stats else 0 }}</div>
                 <div class="label">Total Users</div>
             </div>
             <div class="stat-card">
                 <span class="icon">📁</span>
-                <div class="number">{{ categories|length }}</div>
+                <div class="number">{{ categories|length if categories else 0 }}</div>
                 <div class="label">Categories</div>
             </div>
         </div>
@@ -534,8 +459,8 @@
 
         <!-- ===== MOST VIEWED VIDEOS ===== -->
         <div class="video-list-section">
-            <h3>🏆 Most Viewed Videos <span class="badge">Top 10</span></h3>
-            {% if stats.most_viewed %}
+            <h3>🏆 Most Viewed Videos</h3>
+            {% if stats and stats.most_viewed %}
             <div class="table-wrapper">
                 <table class="data-table">
                     <thead>
@@ -545,24 +470,16 @@
                             <th>Category</th>
                             <th>Uploaded By</th>
                             <th>Views</th>
-                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for video in stats.most_viewed %}
+                        {% for video in stats.most_viewed[:10] %}
                         <tr>
                             <td>{{ loop.index }}</td>
-                            <td class="video-title">{{ video.title }}</td>
-                            <td><span class="views-badge">{{ video.category }}</span></td>
-                            <td>
-                                <a href="/profile/{{ video.uploaded_by }}" style="color: var(--accent); text-decoration: none;">
-                                    {{ video.uploaded_by }}
-                                </a>
-                            </td>
-                            <td><span class="views-badge">👁️ {{ video.views }}</span></td>
-                            <td>
-                                <button class="delete-btn" onclick="deleteVideo('{{ video.id }}')">Delete</button>
-                            </td>
+                            <td>{{ video.title }}</td>
+                            <td>{{ video.category }}</td>
+                            <td>{{ video.uploaded_by }}</td>
+                            <td>{{ video.views }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -575,8 +492,8 @@
 
         <!-- ===== UPLOAD SECTION ===== -->
         <div class="upload-section">
-            <h3>📤 Upload New Movie <span class="badge">Admin Only</span></h3>
-            <form class="upload-form" method="POST" action="/admin/upload" enctype="multipart/form-data" id="uploadForm">
+            <h3>📤 Upload New Movie</h3>
+            <form class="upload-form" method="POST" action="/admin/upload" enctype="multipart/form-data">
                 <div>
                     <label>Category *</label>
                     <select name="category" required>
@@ -592,36 +509,19 @@
                 </div>
                 <div class="full-width">
                     <label>Select Movie File *</label>
-                    <input type="file" name="movie_file" accept=".mp4,.mkv,.avi,.mov" required id="movieFileInput" onchange="showUploadProgress()">
-                    <div class="progress-container" id="uploadProgress">
-                        <div class="progress-fill" id="uploadProgressFill"></div>
-                    </div>
+                    <input type="file" name="movie_file" accept=".mp4,.mkv,.avi,.mov" required>
                 </div>
                 <div class="full-width">
-                    <button type="submit" class="btn-upload" id="uploadBtn">📤 Upload Movie</button>
+                    <button type="submit" class="btn-upload">📤 Upload Movie</button>
                 </div>
             </form>
         </div>
 
         <!-- ===== USER LIST ===== -->
         <div class="user-list-section">
-            <h3>
-                👥 All Users 
-                <span class="user-count">({{ users|length }} total)</span>
-            </h3>
-            
-            <div class="filter-bar">
-                <input type="text" id="userSearch" placeholder="🔍 Search users..." onkeyup="filterUsers()">
-                <select id="userRoleFilter" onchange="filterUsers()">
-                    <option value="">All Roles</option>
-                    <option value="admin">Admin</option>
-                    <option value="user">User</option>
-                </select>
-                <button class="clear-btn" onclick="clearFilters()">Clear Filters</button>
-            </div>
-            
+            <h3>👥 All Users ({{ users|length if users else 0 }})</h3>
             <div class="table-wrapper">
-                <table class="data-table user-table" id="userTable">
+                <table class="data-table user-table">
                     <thead>
                         <tr>
                             <th>User</th>
@@ -633,41 +533,38 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for username, data in users.items() %}
-                        <tr class="user-row" data-username="{{ username }}" data-role="{{ data.role }}">
-                            <td>
-                                <span class="user-avatar">
-                                    {% if data.profile_pic %}
-                                        <img src="{{ data.profile_pic }}" alt="{{ username }}">
+                        {% if users %}
+                            {% for username, data in users.items() %}
+                            <tr>
+                                <td>{{ username }}</td>
+                                <td>
+                                    <span class="role-badge {{ data.role }}">
+                                        {{ data.role|title }}
+                                    </span>
+                                </td>
+                                <td>{{ data.created_at[:10] if data.created_at else 'N/A' }}</td>
+                                <td>{{ data.total_uploads or 0 }}</td>
+                                <td>{{ data.total_views or 0 }}</td>
+                                <td>
+                                    {% if username != 'admin' %}
+                                    <button class="delete-btn" onclick="deleteUser('{{ username }}')">Delete</button>
                                     {% else %}
-                                        {{ username[0].upper() }}
+                                    <span style="color: var(--text-muted); font-size:0.8rem;">🔒 Protected</span>
                                     {% endif %}
-                                </span>
-                                {{ username }}
-                            </td>
-                            <td>
-                                <span class="role-badge {{ data.role }}">
-                                    {{ data.role|title }}
-                                </span>
-                            </td>
-                            <td>{{ data.created_at[:10] if data.created_at else 'N/A' }}</td>
-                            <td>{{ data.total_uploads or 0 }}</td>
-                            <td>{{ data.total_views or 0 }}</td>
-                            <td>
-                                {% if username != 'admin' %}
-                                <button class="delete-btn" onclick="deleteUser('{{ username }}')">Delete</button>
-                                <a href="/profile/{{ username }}" style="color: var(--accent); text-decoration: none; margin-left: 8px; font-size: 0.8rem;">View</a>
-                                {% else %}
-                                <span style="color: var(--text-muted); font-size:0.8rem;">🔒 Protected</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="6" style="text-align:center; color: var(--text-muted);">No users found</td></tr>
+                        {% endif %}
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+
+    <!-- ===== TOAST CONTAINER ===== -->
+    <div class="toast-container" id="toastContainer"></div>
 
     <script>
         // ===== THEME TOGGLE =====
@@ -676,105 +573,86 @@
                 .then(() => location.reload());
         }
 
+        // ===== TOAST =====
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
         // ===== CHARTS =====
-        // Category Chart
-        const ctx1 = document.getElementById('categoryChart').getContext('2d');
+        {% if stats and stats.category_views %}
         const categoryData = {{ stats.category_views|tojson }};
         const categories = Object.keys(categoryData);
         const views = Object.values(categoryData);
 
-        new Chart(ctx1, {
-            type: 'bar',
-            data: {
-                labels: categories,
-                datasets: [{
-                    label: 'Views',
-                    data: views,
-                    backgroundColor: 'rgba(229, 9, 20, 0.7)',
-                    borderColor: '#e50914',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false }
+        if (categories.length > 0) {
+            const ctx1 = document.getElementById('categoryChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        label: 'Views',
+                        data: views,
+                        backgroundColor: 'rgba(229, 9, 20, 0.7)',
+                        borderColor: '#e50914',
+                        borderWidth: 1
+                    }]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#888' }
-                    },
-                    x: {
-                        ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#888' }
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: '#888' } },
+                        x: { ticks: { color: '#888' } }
                     }
                 }
-            }
-        });
+            });
+        }
+        {% endif %}
 
-        // Growth Chart
-        const ctx2 = document.getElementById('growthChart').getContext('2d');
+        {% if stats and stats.growth %}
         const growthData = {{ stats.growth|tojson }};
         const dates = growthData.map(d => d.date);
         const counts = growthData.map(d => d.count);
 
-        new Chart(ctx2, {
-            type: 'line',
-            data: {
-                labels: dates,
-                datasets: [{
-                    label: 'New Users',
-                    data: counts,
-                    borderColor: '#00ff00',
-                    backgroundColor: 'rgba(0, 255, 0, 0.1)',
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false }
+        if (dates.length > 0) {
+            const ctx2 = document.getElementById('growthChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'New Users',
+                        data: counts,
+                        borderColor: '#00ff00',
+                        backgroundColor: 'rgba(0, 255, 0, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#888' }
-                    },
-                    x: {
-                        ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#888' }
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: '#888' } },
+                        x: { ticks: { color: '#888' } }
                     }
                 }
-            }
-        });
-
-        // ===== UPLOAD PROGRESS =====
-        function showUploadProgress() {
-            const fileInput = document.getElementById('movieFileInput');
-            const progress = document.getElementById('uploadProgress');
-            const fill = document.getElementById('uploadProgressFill');
-            
-            if (fileInput.files[0]) {
-                progress.classList.add('active');
-                const size = fileInput.files[0].size;
-                let progressWidth = 0;
-                const interval = setInterval(() => {
-                    progressWidth += 5;
-                    if (progressWidth <= 90) {
-                        fill.style.width = progressWidth + '%';
-                    } else {
-                        clearInterval(interval);
-                    }
-                }, 300);
-                
-                // Reset when form submits
-                document.getElementById('uploadForm').addEventListener('submit', function() {
-                    fill.style.width = '100%';
-                });
-            }
+            });
         }
+        {% endif %}
 
-        // ===== DELETE FUNCTIONS =====
+        // ===== DELETE USER =====
         function deleteUser(username) {
             if (confirm(`⚠️ Are you sure you want to delete user "${username}" and ALL their videos?\n\nThis action cannot be undone!`)) {
                 fetch(`/api/admin/delete-user/${username}`, {
@@ -792,128 +670,6 @@
                 .catch(() => showToast('❌ Delete failed', 'error'));
             }
         }
-
-        function deleteVideo(videoId) {
-            if (confirm('⚠️ Are you sure you want to delete this video?\n\nThis action cannot be undone!')) {
-                fetch(`/api/admin/delete-video/${videoId}`, {
-                    method: 'DELETE'
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        showToast('✅ ' + data.message, 'success');
-                        setTimeout(() => location.reload(), 1000);
-                    } else {
-                        showToast('❌ ' + data.error, 'error');
-                    }
-                })
-                .catch(() => showToast('❌ Delete failed', 'error'));
-            }
-        }
-
-        // ===== FILTER USERS =====
-        function filterUsers() {
-            const search = document.getElementById('userSearch').value.toLowerCase();
-            const roleFilter = document.getElementById('userRoleFilter').value;
-            const rows = document.querySelectorAll('.user-row');
-            
-            rows.forEach(row => {
-                const username = row.dataset.username.toLowerCase();
-                const role = row.dataset.role;
-                let show = true;
-                
-                if (search && !username.includes(search)) show = false;
-                if (roleFilter && role !== roleFilter) show = false;
-                
-                row.style.display = show ? '' : 'none';
-            });
-        }
-
-        function clearFilters() {
-            document.getElementById('userSearch').value = '';
-            document.getElementById('userRoleFilter').value = '';
-            filterUsers();
-        }
-
-        // ===== REFRESH DATA =====
-        function refreshData() {
-            const btn = event.target;
-            btn.textContent = '⏳ Loading...';
-            btn.disabled = true;
-            
-            fetch('/api/admin/stats')
-                .then(r => r.json())
-                .then(data => {
-                    if (data.stats) {
-                        document.getElementById('totalVideos').textContent = data.stats.total_videos;
-                        document.getElementById('totalViews').textContent = data.stats.total_views;
-                        document.getElementById('totalUsers').textContent = data.stats.total_users;
-                        document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
-                        showToast('✅ Data refreshed!', 'success');
-                    }
-                })
-                .catch(() => showToast('❌ Refresh failed', 'error'))
-                .finally(() => {
-                    btn.textContent = '🔄 Refresh';
-                    btn.disabled = false;
-                });
-        }
-
-        // ===== TOAST NOTIFICATIONS =====
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                padding: 15px 25px;
-                border-radius: 8px;
-                background: var(--bg-secondary);
-                border: 1px solid var(--border-color);
-                color: var(--text-primary);
-                box-shadow: 0 10px 30px var(--shadow);
-                z-index: 9999;
-                animation: slideIn 0.3s ease;
-                max-width: 400px;
-                border-left: 4px solid ${type === 'success' ? '#00ff00' : '#ff4444'};
-            `;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(100%)';
-                toast.style.transition = 'all 0.3s';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        // ===== KEYBOARD SHORTCUTS =====
-        document.addEventListener('keydown', function(e) {
-            // Ctrl + F = Focus search
-            if (e.ctrlKey && e.key === 'f') {
-                e.preventDefault();
-                document.getElementById('userSearch').focus();
-            }
-            // Escape = Clear search
-            if (e.key === 'Escape') {
-                clearFilters();
-            }
-        });
-
-        // ===== AUTO-REFRESH STATS EVERY 30 SECONDS =====
-        setInterval(() => {
-            fetch('/api/admin/stats')
-                .then(r => r.json())
-                .then(data => {
-                    if (data.stats) {
-                        document.getElementById('totalVideos').textContent = data.stats.total_videos;
-                        document.getElementById('totalViews').textContent = data.stats.total_views;
-                        document.getElementById('totalUsers').textContent = data.stats.total_users;
-                    }
-                })
-                .catch(() => {});
-        }, 30000);
     </script>
 </body>
 </html>
