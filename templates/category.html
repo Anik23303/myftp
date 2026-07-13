@@ -5,50 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ category.name }} - Movie FTP</title>
     <style>
-        /* ===== THEME VARIABLES ===== */
-        :root {
-            --bg-primary: #141414;
-            --bg-secondary: #1a1a2e;
-            --bg-card: #1a1a2e;
-            --bg-hover: #2a2a3e;
-            --text-primary: #ffffff;
-            --text-secondary: #e5e5e5;
-            --text-muted: #888888;
-            --border-color: #333333;
-            --accent: #e50914;
-            --accent-hover: #ff0a1a;
-            --shadow: rgba(0,0,0,0.8);
-            --success: #00ff00;
-            --gold: #ffd700;
-        }
-        
-        [data-theme="light"] {
-            --bg-primary: #f5f5f5;
-            --bg-secondary: #ffffff;
-            --bg-card: #ffffff;
-            --bg-hover: #e8e8e8;
-            --text-primary: #141414;
-            --text-secondary: #333333;
-            --text-muted: #666666;
-            --border-color: #dddddd;
-            --shadow: rgba(0,0,0,0.1);
-        }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             font-family: 'Helvetica Neue', Arial, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            background: #141414;
+            color: #fff;
             min-height: 100vh;
-            transition: background 0.3s, color 0.3s;
         }
         
-        /* ===== SCROLLBAR ===== */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-primary); }
-        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
-
-        /* ===== NAVBAR ===== */
         .navbar {
             position: fixed;
             top: 0;
@@ -59,13 +23,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--bg-primary);
-            border-bottom: 1px solid var(--border-color);
+            background: #141414;
+            border-bottom: 1px solid #333;
             flex-wrap: wrap;
             gap: 10px;
         }
         .navbar .brand a {
-            color: var(--accent);
+            color: #e50914;
             text-decoration: none;
             font-size: 1.5rem;
             font-weight: bold;
@@ -76,38 +40,19 @@
             gap: 20px;
         }
         .navbar .nav-right a {
-            color: var(--text-secondary);
+            color: #e5e5e5;
             text-decoration: none;
             transition: color 0.3s;
         }
-        .navbar .nav-right a:hover { color: var(--text-primary); }
-        .navbar .nav-right .theme-toggle {
-            background: none;
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            padding: 6px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-        }
-        .navbar .nav-right .theme-toggle:hover {
-            border-color: var(--accent);
-            color: var(--text-primary);
-        }
+        .navbar .nav-right a:hover { color: #fff; }
         
-        /* ===== CONTAINER ===== */
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 80px 30px 30px;
         }
-        
-        /* ===== CATEGORY HEADER ===== */
         .category-header {
             margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
         }
         .category-header h1 {
             font-size: 2.5rem;
@@ -116,96 +61,40 @@
             gap: 15px;
         }
         .category-header .adult-badge {
-            background: var(--accent);
+            background: #e50914;
             font-size: 0.8rem;
             padding: 4px 16px;
             border-radius: 20px;
-            color: white;
         }
-        .category-header .category-stats {
-            color: var(--text-muted);
-            margin-top: 8px;
-            font-size: 0.95rem;
-        }
-        .category-header .category-stats span {
-            background: var(--bg-hover);
-            padding: 2px 12px;
-            border-radius: 12px;
-            margin-right: 10px;
+        .category-header p {
+            color: #888;
+            margin-top: 5px;
         }
         
-        /* ===== BACK LINK ===== */
-        .back-link {
-            display: inline-block;
-            color: var(--accent);
-            text-decoration: none;
-            margin-bottom: 15px;
-            font-weight: bold;
-            transition: color 0.3s;
-        }
-        .back-link:hover {
-            text-decoration: underline;
-        }
-        
-        /* ===== MOVIES GRID ===== */
         .movies-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 25px;
         }
         .movie-card {
-            background: var(--bg-secondary);
-            border-radius: 10px;
+            background: #1a1a2e;
+            border-radius: 8px;
             overflow: hidden;
             transition: transform 0.3s, box-shadow 0.3s;
-            border: 1px solid var(--border-color);
-            position: relative;
+            border: 1px solid #333;
         }
         .movie-card:hover {
             transform: scale(1.05);
-            box-shadow: 0 15px 40px var(--shadow);
-            border-color: var(--accent);
-            z-index: 10;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            border-color: #e50914;
         }
         .movie-card .poster {
             height: 300px;
-            background: var(--bg-hover);
+            background: #2a2a3e;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 4rem;
-            position: relative;
-        }
-        .movie-card .poster .views-badge {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.8);
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-        .movie-card .poster .rating-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.8);
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            color: var(--gold);
-        }
-        .movie-card .poster .adult-tag {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: var(--accent);
-            color: white;
-            padding: 2px 12px;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            font-weight: bold;
         }
         .movie-card .info {
             padding: 15px;
@@ -213,10 +102,9 @@
         .movie-card .info .title {
             font-weight: bold;
             font-size: 1rem;
-            margin-bottom: 4px;
         }
         .movie-card .info .meta {
-            color: var(--text-muted);
+            color: #888;
             font-size: 0.8rem;
             display: flex;
             gap: 10px;
@@ -224,19 +112,14 @@
             flex-wrap: wrap;
         }
         .movie-card .info .meta span {
-            background: var(--bg-hover);
+            background: #2a2a3e;
             padding: 2px 10px;
             border-radius: 4px;
-        }
-        .movie-card .info .rating-stars {
-            color: var(--gold);
-            font-size: 0.9rem;
-            margin-top: 5px;
         }
         .movie-card .actions {
             padding: 10px 15px 15px;
             display: flex;
-            gap: 8px;
+            gap: 10px;
         }
         .movie-card .actions a {
             flex: 1;
@@ -246,65 +129,36 @@
             text-decoration: none;
             font-size: 0.85rem;
             font-weight: bold;
-            transition: all 0.3s;
         }
-        .btn-stream { background: var(--accent); color: white; }
-        .btn-stream:hover { background: var(--accent-hover); }
-        .btn-download { background: var(--bg-hover); color: var(--text-secondary); }
-        .btn-download:hover { background: var(--bg-hover); opacity: 0.8; }
-        .btn-mylist { 
-            background: transparent; 
-            color: var(--gold); 
-            border: 1px solid var(--gold);
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: bold;
-            transition: all 0.3s;
+        .btn-stream { 
+            background: #e50914; 
+            color: white; 
         }
-        .btn-mylist:hover { background: var(--gold); color: #141414; }
-        .btn-mylist.in-list { background: var(--gold); color: #141414; }
+        .btn-stream:hover { 
+            background: #ff0a1a; 
+        }
+        .btn-download { 
+            background: #2a2a3e; 
+            color: #ddd; 
+        }
+        .btn-download:hover { 
+            background: #3a3a5e; 
+        }
         
-        /* ===== EMPTY STATE ===== */
         .empty-state {
             text-align: center;
-            padding: 80px 20px;
-            color: var(--text-muted);
-            grid-column: 1 / -1;
+            padding: 60px 20px;
+            color: #666;
         }
-        .empty-state .icon { font-size: 5rem; display: block; margin-bottom: 20px; }
-        .empty-state h2 { color: var(--text-secondary); margin-bottom: 10px; }
+        .empty-state .icon { font-size: 4rem; display: block; margin-bottom: 20px; }
+        .back-link {
+            display: inline-block;
+            color: #e50914;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+        .back-link:hover { text-decoration: underline; }
         
-        /* ===== TOAST ===== */
-        .toast-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .toast {
-            padding: 12px 20px;
-            border-radius: 8px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            box-shadow: 0 10px 30px var(--shadow);
-            animation: slideIn 0.3s ease;
-            border-left: 4px solid var(--success);
-            max-width: 350px;
-        }
-        .toast.error { border-left-color: var(--accent); }
-        .toast.info { border-left-color: var(--gold); }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .container { padding: 70px 15px 20px; }
             .movies-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
@@ -312,26 +166,12 @@
             .navbar { padding: 10px 15px; }
             .category-header h1 { font-size: 1.8rem; }
         }
-        @media (max-width: 480px) {
-            .movies-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-            .movie-card .poster { height: 160px; font-size: 2.5rem; }
-            .movie-card .info { padding: 10px; }
-            .movie-card .info .title { font-size: 0.85rem; }
-            .movie-card .actions { flex-wrap: wrap; }
-            .movie-card .actions a { font-size: 0.7rem; padding: 5px; }
-            .btn-mylist { font-size: 0.7rem; padding: 5px 8px; }
-        }
     </style>
 </head>
-<body data-theme="{{ theme }}">
-
-    <!-- ===== NAVBAR ===== -->
+<body>
     <nav class="navbar">
         <div class="brand"><a href="/">🎬 Movie FTP</a></div>
         <div class="nav-right">
-            <button class="theme-toggle" onclick="toggleTheme()">
-                {% if theme == 'dark' %}☀️ Light{% else %}🌙 Dark{% endif %}
-            </button>
             <a href="/">Home</a>
             {% if logged_in %}
                 <a href="/dashboard">Dashboard</a>
@@ -342,13 +182,9 @@
         </div>
     </nav>
 
-    <!-- ===== CONTAINER ===== -->
     <div class="container">
-        
-        <!-- ===== BACK LINK ===== -->
         <a href="/" class="back-link">← Back to home</a>
         
-        <!-- ===== CATEGORY HEADER ===== -->
         <div class="category-header">
             <h1>
                 {{ category.icon }} {{ category.name }}
@@ -356,30 +192,15 @@
                 <span class="adult-badge">🔞 18+</span>
                 {% endif %}
             </h1>
-            <div class="category-stats">
-                <span>🎬 {{ movies|length }} movies</span>
-                {% if category.id == 'adult' %}
-                <span style="color: var(--accent);">🔞 Adult Content</span>
-                {% endif %}
-            </div>
+            <p>{{ movies|length }} movies available</p>
         </div>
-
-        <!-- ===== MOVIES GRID ===== -->
+        
         {% if movies %}
         <div class="movies-grid">
             {% for movie in movies %}
-            <div class="movie-card" data-video-id="{{ movie.id }}">
+            <div class="movie-card">
                 <div class="poster" style="background: {{ movie.get('thumbnail_color', '#2a2a3e') }};">
                     {{ movie.get('poster', '🎬') }}
-                    {% if category.id == 'adult' %}
-                    <span class="adult-tag">🔞 18+</span>
-                    {% endif %}
-                    {% if movie.rating %}
-                    <span class="rating-badge">⭐ {{ movie.rating }}</span>
-                    {% endif %}
-                    {% if movie.views %}
-                    <span class="views-badge">👁️ {{ movie.views }}</span>
-                    {% endif %}
                 </div>
                 <div class="info">
                     <div class="title">{{ movie.title }}</div>
@@ -388,22 +209,11 @@
                         <span>{{ movie.size }}</span>
                         <span>{{ movie.format }}</span>
                     </div>
-                    {% if movie.rating %}
-                    <div class="rating-stars">
-                        {% set stars = movie.rating|int %}
-                        {% for i in range(stars) %}⭐{% endfor %}
-                        {% if stars < 5 %}
-                            {% for i in range(5 - stars) %}☆{% endfor %}
-                        {% endif %}
-                    </div>
-                    {% endif %}
                 </div>
                 <div class="actions">
+                    <!-- UPDATED: Links to /watch/ instead of /stream/ -->
                     <a href="/watch/{{ movie.id }}" class="btn-stream">▶ Stream</a>
                     <a href="/download/{{ category.id }}/{{ movie.filename }}" class="btn-download">⬇ Download</a>
-                    {% if logged_in %}
-                    <button class="btn-mylist" onclick="toggleMyList('{{ movie.id }}', this)">📋 Add</button>
-                    {% endif %}
                 </div>
             </div>
             {% endfor %}
@@ -412,95 +222,9 @@
         <div class="empty-state">
             <span class="icon">🎬</span>
             <h2>No movies found</h2>
-            <p>This category is empty. Check back later!</p>
+            <p>This category is empty.</p>
         </div>
         {% endif %}
     </div>
-
-    <!-- ===== TOAST CONTAINER ===== -->
-    <div class="toast-container" id="toastContainer"></div>
-
-    <script>
-        // ===== THEME TOGGLE =====
-        function toggleTheme() {
-            fetch('/toggle-theme')
-                .then(() => location.reload());
-        }
-
-        // ===== TOAST =====
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(100%)';
-                toast.style.transition = 'all 0.3s';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        // ===== MY LIST TOGGLE =====
-        function toggleMyList(videoId, button) {
-            if (!videoId) {
-                showToast('Please login first', 'error');
-                return;
-            }
-
-            const isInList = button.classList.contains('in-list');
-            const url = isInList ? `/api/mylist/remove/${videoId}` : `/api/mylist/add/${videoId}`;
-            const method = isInList ? 'DELETE' : 'POST';
-
-            fetch(url, { method: method })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success !== false) {
-                        if (isInList) {
-                            button.classList.remove('in-list');
-                            button.textContent = '📋 Add';
-                            showToast('Removed from My List', 'info');
-                        } else {
-                            button.classList.add('in-list');
-                            button.textContent = '✅ In List';
-                            showToast('✅ Added to My List!', 'success');
-                        }
-                    }
-                })
-                .catch(() => showToast('Error updating My List', 'error'));
-        }
-
-        // ===== KEYBOARD SHORTCUTS =====
-        document.addEventListener('keydown', function(e) {
-            // Escape to go back
-            if (e.key === 'Escape') {
-                window.location.href = '/';
-            }
-        });
-
-        // ===== CHECK IF VIDEOS ARE IN MY LIST (for logged in users) =====
-        {% if logged_in %}
-        document.addEventListener('DOMContentLoaded', function() {
-            // Fetch user's My List and update buttons
-            fetch('/api/mylist')
-                .then(r => r.json())
-                .then(data => {
-                    const mylist = data.mylist || [];
-                    document.querySelectorAll('.movie-card[data-video-id]').forEach(card => {
-                        const videoId = card.dataset.videoId;
-                        if (mylist.some(v => v.id === videoId)) {
-                            const btn = card.querySelector('.btn-mylist');
-                            if (btn) {
-                                btn.classList.add('in-list');
-                                btn.textContent = '✅ In List';
-                            }
-                        }
-                    });
-                })
-                .catch(() => {});
-        });
-        {% endif %}
-    </script>
 </body>
 </html>
