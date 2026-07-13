@@ -1291,7 +1291,6 @@
                     const container = document.getElementById('sidebarLeaderboardList');
                     if (!container) return;
                     
-                    // Get existing items
                     const existingItems = container.querySelectorAll('.lb-item');
                     const existingData = [];
                     existingItems.forEach(item => {
@@ -1305,16 +1304,13 @@
                         }
                     });
                     
-                    // Update views without re-rendering
                     leaderboard.slice(0, 5).forEach((user, index) => {
                         const existing = existingData.find(e => e.username === user.username);
                         if (existing) {
-                            // Only update if view count changed
                             const currentText = existing.viewsElement.textContent;
                             const newText = `${user.total_views} views`;
                             if (currentText !== newText) {
                                 existing.viewsElement.textContent = newText;
-                                // Highlight animation
                                 existing.viewsElement.style.transition = 'color 0.3s';
                                 existing.viewsElement.style.color = 'var(--gold)';
                                 setTimeout(() => {
@@ -1322,7 +1318,6 @@
                                 }, 500);
                             }
                         } else {
-                            // Item not found - full refresh needed
                             location.reload();
                         }
                     });
@@ -1330,7 +1325,6 @@
                 .catch(() => {});
         }
         
-        // Update sidebar leaderboard every 5 seconds (smooth, no blink)
         setInterval(updateSidebarLeaderboard, 5000);
         {% endif %}
 
@@ -1346,12 +1340,10 @@
 
         // ===== KEYBOARD SHORTCUTS =====
         document.addEventListener('keydown', function(e) {
-            // Ctrl + K = Open search
             if (e.ctrlKey && e.key === 'k') {
                 e.preventDefault();
                 document.querySelector('.search-bar input')?.focus();
             }
-            // Escape = Close sidebar
             if (e.key === 'Escape') {
                 closeSidebar();
             }
