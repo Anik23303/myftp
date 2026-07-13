@@ -1,36 +1,4 @@
 {
-    "a3f7b9c1d4e2f8a5": {
-        "title": "The Dark Knight",
-        "filename": "dark_knight_1080p.mp4",
-        "category": "action",
-        "uploaded_by": "john_doe",
-        "uploaded_at": "2026-07-13T12:00:00.123456",
-        "views": 245,
-        "size": "2.1 GB",
-        "format": "MP4"
-    },
-    "b8e2f5c7d1a4f9b6": {
-        "title": "Inception",
-        "filename": "inception_4k.mkv",
-        "category": "sci-fi",
-        "uploaded_by": "jane_smith",
-        "uploaded_at": "2026-07-13T13:30:00.654321",
-        "views": 189,
-        "size": "3.5 GB",
-        "format": "MKV"
-    },
-    "c5f9a2b7d1e4f8c3": {
-        "title": "Adult Collection Vol 1",
-        "filename": "adult_vol1.mp4",
-        "category": "adult",
-        "uploaded_by": "anonymous_user",
-        "uploaded_at": "2026-07-13T15:45:00.987654",
-        "views": 567,
-        "size": "4.2 GB",
-        "format": "MP4"
-    }
-}
-{
     "adult_sundutan": {
         "title": "18+ Sundutan",
         "category": "adult",
