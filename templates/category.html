@@ -399,7 +399,7 @@
                     {% endif %}
                 </div>
                 <div class="actions">
-                    <a href="/stream/{{ category.id }}/{{ movie.filename }}" class="btn-stream">▶ Stream</a>
+                    <a href="/watch/{{ movie.id }}" class="btn-stream">▶ Stream</a>
                     <a href="/download/{{ category.id }}/{{ movie.filename }}" class="btn-download">⬇ Download</a>
                     {% if logged_in %}
                     <button class="btn-mylist" onclick="toggleMyList('{{ movie.id }}', this)">📋 Add</button>
